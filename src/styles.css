@@ -100,6 +100,22 @@ h1 em, h2 em { font-style: normal; color: var(--coral); }
 .theme-light.admin-dashboard .csv-import-card { background: #f4eadd; color: var(--ink); }.theme-light.admin-dashboard .csv-import-card p { color: #8d7d74; }.theme-light.admin-dashboard .csv-import-card .card-kicker { color: #b65336; }.theme-light.admin-dashboard .csv-import-card h2 em { color: #b65336; }.theme-light.admin-dashboard .csv-instructions { border-color: rgba(35,21,26,.16); }.theme-light.admin-dashboard .csv-instructions strong { color: var(--ink); }.theme-light.admin-dashboard .csv-instructions code { color: #b65336; }.theme-light.admin-dashboard .csv-instructions pre { background: rgba(35,21,26,.07); }.theme-light.admin-dashboard .csv-instructions pre code { color: var(--ink); }.theme-light.admin-dashboard .csv-note { color: #a18e84 !important; }.theme-light.admin-dashboard .csv-file-button { background: var(--ink); color: var(--lime); }
 @media (max-width: 700px) { .admin-aside-tools { gap: .9rem; }.screen-header-right, .game-header-right { gap: .45rem; }.screen-header-right .theme-toggle, .game-header-right .theme-toggle { padding-left: .4rem; padding-right: .5rem; }.game-header-right .round-counter { display: none; }.finished-screen .finished-header { left: 1.25rem; right: 1.25rem; }.dashboard-tabs { margin-top: -1rem; overflow-x: auto; scrollbar-width: none; }.dashboard-tabs::-webkit-scrollbar { display: none; } }
 
+/* Keep the theme control centered and stable in both admin layouts. */
+.theme-toggle { min-height: 2.35rem; flex: 0 0 auto; }
+.theme-toggle-icon { flex: 0 0 1.35rem; line-height: 1; text-align: center; padding: 0; }
+.admin-aside-tools .theme-toggle { align-self: flex-start; }
+.dashboard-header > a { flex: 0 0 auto; }
+.dashboard-user { min-width: 0; }
+.dashboard-user .theme-toggle { flex: 0 0 auto; }
+
+@media (max-width: 700px) {
+  .dashboard-header { min-width: 0; gap: .75rem; }
+  .dashboard-user { gap: .55rem; }
+  .dashboard-user .theme-toggle { padding-left: .45rem; padding-right: .55rem; }
+  .dashboard-user .theme-toggle-icon { display: grid; }
+  .dashboard-user .theme-toggle > span:last-child { display: inline; }
+}
+
 @media (max-width: 700px) {
   .dashboard-content { width: 100%; min-width: 0; }
   .admin-columns { grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; }
