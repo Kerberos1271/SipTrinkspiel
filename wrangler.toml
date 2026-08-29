@@ -7,7 +7,7 @@ binding = "DB"
 database_name = "sip-db"
 # Keep the database name here for local Pages development. Replace this value
 # with the UUID returned by `wrangler d1 create sip-db` before deploying.
-database_id = "sip-db"
+database_id = "c087ca47-7019-4466-8ea5-85368044bf55"
 
 # Set a strong value in the Cloudflare dashboard for production.
 # Local development uses the fallback in functions/lib/auth.ts.
