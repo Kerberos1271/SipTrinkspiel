@@ -26,7 +26,7 @@ INSERT OR IGNORE INTO categories (id, name) VALUES
   (3, 'Einzelaufgaben');
 
 INSERT INTO admins (username, password_hash)
-VALUES ('admin', '8d764bd4bda4b5a4129802ea676e0b69bf266b373653f6f54cd9936b95a3f933')
+VALUES ('admin', 'b4432f83179c84d8b37c9dd9dcc37e971e3e706c1c77f4390b4354a16e816ac9')
 ON CONFLICT(username) DO UPDATE SET password_hash = excluded.password_hash;
 
 INSERT OR IGNORE INTO cards (id, text, category_id) VALUES

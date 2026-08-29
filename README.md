@@ -20,7 +20,7 @@ Alternativ den Pages-/D1-Workflow manuell starten:
 
 ```bash
 npm run build
-npx wrangler pages dev dist --d1 DB=sip-db --local
+npx wrangler pages dev dist --local
 ```
 
 Das entspricht dem Kurzskript `npm run dev:cf`. Beim ersten lokalen Start Datenbank anlegen und befüllen:

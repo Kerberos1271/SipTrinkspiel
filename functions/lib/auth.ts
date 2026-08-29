@@ -3,6 +3,7 @@ import type { Env } from '../types';
 
 const COOKIE_NAME = 'sip_session';
 const SESSION_TTL = 60 * 60 * 8;
+const PASSWORD_ITERATIONS = 100_000;
 
 function base64UrlEncode(value: string | ArrayBuffer): string {
   const bytes = typeof value === 'string' ? new TextEncoder().encode(value) : new Uint8Array(value);
@@ -24,7 +25,7 @@ async function sign(value: string, secret: string): Promise<string> {
 
 export async function hashPassword(password: string): Promise<string> {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
-  const digest = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: new TextEncoder().encode('sip-admin-password-salt-v1'), iterations: 120000, hash: 'SHA-256' }, key, 256);
+  const digest = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: new TextEncoder().encode('sip-admin-password-salt-v1'), iterations: PASSWORD_ITERATIONS, hash: 'SHA-256' }, key, 256);
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
