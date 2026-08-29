@@ -1,0 +1,15 @@
+name = "sip-party"
+compatibility_date = "2026-08-29"
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sip-db"
+# Keep the database name here for local Pages development. Replace this value
+# with the UUID returned by `wrangler d1 create sip-db` before deploying.
+database_id = "sip-db"
+
+# Set a strong value in the Cloudflare dashboard for production.
+# Local development uses the fallback in functions/lib/auth.ts.
+# [vars]
+# SESSION_SECRET = "replace-with-a-long-random-secret"

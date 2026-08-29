@@ -1,0 +1,13 @@
+{
+  "name": "sip. – Partyspiel",
+  "short_name": "sip.",
+  "description": "Das entspannte Karten-Partyspiel für deine Runde.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#23151a",
+  "theme_color": "#23151a",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
