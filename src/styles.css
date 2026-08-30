@@ -399,7 +399,7 @@ button:active:not(:disabled), a:active { transform: scale(.97); }
 
 /* Feedback and confirmation surfaces. */
 .toast-viewport { position: fixed; right: 0; bottom: 0; left: 0; z-index: 80; display: grid; justify-items: center; gap: .55rem; padding: 1rem 1rem max(1.5rem, calc(env(safe-area-inset-bottom) + 1rem)); pointer-events: none; }
-.toast { display: flex; width: fit-content; max-width: min(100%, 32rem); min-height: 44px; align-items: center; gap: .65rem; padding: .35rem .45rem .35rem .6rem; border: 1px solid var(--color-border-strong); border-radius: 99px; background: color-mix(in srgb, var(--color-surface-raised) 94%, var(--color-text)); color: var(--color-text); box-shadow: 0 .8rem 2.2rem var(--color-shadow); backdrop-filter: blur(12px); pointer-events: auto; animation: toast-in .22s cubic-bezier(.2, .8, .2, 1) both; }
+.toast { display: flex; width: fit-content; max-width: min(100%, 32rem); min-height: 44px; align-items: center; gap: .65rem; padding: .35rem .45rem .35rem .6rem; border: 1px solid var(--color-border-strong); border-radius: 99px; background: var(--color-surface-raised); color: var(--color-text); box-shadow: 0 .8rem 2.2rem var(--color-shadow); backdrop-filter: blur(12px); pointer-events: auto; animation: toast-in .22s cubic-bezier(.2, .8, .2, 1) both; }
 .toast.is-error { border-color: color-mix(in srgb, var(--color-danger) 62%, var(--color-border)); }
 .toast.is-info { border-color: color-mix(in srgb, var(--color-info) 52%, var(--color-border)); }
 .toast.is-leaving { animation: toast-out .2s ease-in both; }
