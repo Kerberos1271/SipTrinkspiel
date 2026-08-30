@@ -6,6 +6,16 @@ type GameData = { categories: Category[]; cards: Card[] };
 type Screen = 'home' | 'setup' | 'game' | 'finished';
 type Theme = 'dark' | 'light';
 
+type InstallPromptOutcome = 'accepted' | 'dismissed' | 'unavailable';
+
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[];
+  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+  prompt: () => Promise<void>;
+}
+
+type StandaloneNavigator = Navigator & { standalone?: boolean };
+
 const PAGE_SIZE = 15;
 const fallbackData: GameData = {
   categories: [
@@ -54,7 +64,72 @@ function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }
   return <button className="theme-toggle" type="button" onClick={(event) => { event.stopPropagation(); onToggle(); }} aria-label={`Zu ${isLight ? 'Dark' : 'Light'} Mode wechseln`}><span className="theme-toggle-icon" aria-hidden="true">{isLight ? '☾' : '☼'}</span><span>{isLight ? 'Dark' : 'Light'}</span></button>;
 }
 
+function usePwaInstall() {
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [isPrompting, setIsPrompting] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(display-mode: standalone)');
+    const updateStandaloneState = () => {
+      const iosStandalone = Boolean((window.navigator as StandaloneNavigator).standalone);
+      setIsStandalone(mediaQuery.matches || iosStandalone);
+    };
+    const handleBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setDeferredPrompt(event as BeforeInstallPromptEvent);
+    };
+    const handleAppInstalled = () => {
+      setDeferredPrompt(null);
+      setIsInstalled(true);
+    };
+
+    updateStandaloneState();
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+    window.addEventListener('pageshow', updateStandaloneState);
+    document.addEventListener('visibilitychange', updateStandaloneState);
+    if (mediaQuery.addEventListener) mediaQuery.addEventListener('change', updateStandaloneState);
+    else mediaQuery.addListener(updateStandaloneState);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+      window.removeEventListener('pageshow', updateStandaloneState);
+      document.removeEventListener('visibilitychange', updateStandaloneState);
+      if (mediaQuery.removeEventListener) mediaQuery.removeEventListener('change', updateStandaloneState);
+      else mediaQuery.removeListener(updateStandaloneState);
+    };
+  }, []);
+
+  const promptInstall = async (): Promise<InstallPromptOutcome> => {
+    if (!deferredPrompt || isPrompting) return 'unavailable';
+
+    const promptEvent = deferredPrompt;
+    setDeferredPrompt(null);
+    setIsPrompting(true);
+    try {
+      await promptEvent.prompt();
+      const choice = await promptEvent.userChoice;
+      if (choice.outcome === 'accepted') setIsInstalled(true);
+      return choice.outcome;
+    } catch {
+      return 'unavailable';
+    } finally {
+      setIsPrompting(false);
+    }
+  };
+
+  return {
+    isInstallButtonVisible: !isStandalone && !isInstalled,
+    isPrompting,
+    promptInstall,
+  };
+}
+
 function App() {
+  const pwaInstall = usePwaInstall();
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window === 'undefined') return 'dark';
     return window.localStorage.getItem('sip-theme') === 'light' ? 'light' : 'dark';
@@ -67,10 +142,10 @@ function App() {
   const toggleTheme = () => setTheme((current) => current === 'light' ? 'dark' : 'light');
   if (window.location.pathname.startsWith('/admin')) return <AdminApp theme={theme} onToggleTheme={toggleTheme} />;
   if (window.location.pathname === '/install') return <InstallGuide theme={theme} onToggleTheme={toggleTheme} />;
-  return <PlayerApp theme={theme} onToggleTheme={toggleTheme} />;
+  return <PlayerApp theme={theme} onToggleTheme={toggleTheme} pwaInstall={pwaInstall} />;
 }
 
-function PlayerApp({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
+function PlayerApp({ theme, onToggleTheme, pwaInstall }: { theme: Theme; onToggleTheme: () => void; pwaInstall: ReturnType<typeof usePwaInstall> }) {
   const [screen, setScreen] = useState<Screen>('home');
   const [data, setData] = useState<GameData>(fallbackData);
   const [players, setPlayers] = useState<string[]>(['Mia', 'Tom']);
@@ -100,15 +175,19 @@ function PlayerApp({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () =
   if (screen === 'setup') return <SetupScreen theme={theme} onToggleTheme={onToggleTheme} data={data} players={players} setPlayers={setPlayers} activeCategoryIds={activeCategoryIds} setActiveCategoryIds={setActiveCategoryIds} onBack={() => setScreen('home')} onStart={startGame} loading={loadState === 'loading'} />;
   if (screen === 'game') return <GameScreen theme={theme} onToggleTheme={onToggleTheme} deck={deck} players={players} onFinish={() => setScreen('finished')} onExit={() => setScreen('home')} />;
   if (screen === 'finished') return <FinishedScreen theme={theme} onToggleTheme={onToggleTheme} onAgain={() => setScreen('setup')} onHome={() => setScreen('home')} />;
-  return <HomeScreen theme={theme} onToggleTheme={onToggleTheme} onPlay={() => setScreen('setup')} />;
+  return <HomeScreen theme={theme} onToggleTheme={onToggleTheme} onPlay={() => setScreen('setup')} pwaInstall={pwaInstall} />;
 }
 
 function AppFrame({ children, className = '', onClick, theme = 'dark' }: { children: React.ReactNode; className?: string; onClick?: () => void; theme?: Theme }) {
   return <main className={`app-frame theme-${theme} ${className}`} onClick={onClick}>{children}</main>;
 }
 
-function HomeScreen({ theme, onToggleTheme, onPlay }: { theme: Theme; onToggleTheme: () => void; onPlay: () => void }) {
+function HomeScreen({ theme, onToggleTheme, onPlay, pwaInstall }: { theme: Theme; onToggleTheme: () => void; onPlay: () => void; pwaInstall: ReturnType<typeof usePwaInstall> }) {
   const isLight = theme === 'light';
+  const handleInstall = async () => {
+    const outcome = await pwaInstall.promptInstall();
+    if (outcome === 'unavailable') window.location.assign('/install');
+  };
   return <AppFrame theme={theme} className="home-screen">
     <div className="ambient-orb orb-one" /><div className="ambient-orb orb-two" />
     <header className="home-header"><Logo light={!isLight} /><div className="home-tools"><ThemeToggle theme={theme} onToggle={onToggleTheme} /></div></header>
@@ -117,14 +196,14 @@ function HomeScreen({ theme, onToggleTheme, onPlay }: { theme: Theme; onToggleTh
       <h1>Gute Leute.<br /><em>Gute Ausreden.</em><br />Ein Drink.</h1>
       <p className="hero-copy">Das Karten-Partyspiel, bei dem jede Runde ein bisschen anders läuft.</p>
       <button className="play-button" type="button" onClick={onPlay}><span>Play</span><span className="play-arrow"><ArrowIcon /></span></button>
-      <a className="install-link" href="/install">Wie installiere ich sip. auf meinem Smartphone? <ArrowIcon /></a>
+      {pwaInstall.isInstallButtonVisible && <button className="install-link" type="button" onClick={() => void handleInstall()} disabled={pwaInstall.isPrompting}><span>Installiere sip. auf deinem Smartphone</span><ArrowIcon /></button>}
     </section>
     <footer className="home-footer"><span>Kein Login. Kein Score.</span><a href="/admin">Admin Login <ArrowIcon /></a></footer>
   </AppFrame>;
 }
 
 function InstallGuide({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
-  const [device, setDevice] = useState<'ios' | 'android'>('ios');
+  const [device, setDevice] = useState<'ios' | 'android'>(() => /iphone|ipad|ipod/i.test(navigator.userAgent) ? 'ios' : 'android');
   const steps = device === 'ios'
     ? [
         ['01', 'Teilen öffnen', 'Tippe in Safari auf das Teilen-Symbol – das Quadrat mit dem Pfeil nach oben.'],

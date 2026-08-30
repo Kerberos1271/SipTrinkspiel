@@ -89,8 +89,9 @@ h1 em, h2 em { color: var(--color-secondary); font-style: normal; }
 .play-button:hover, .play-button:focus-visible { transform: translateY(-2px) rotate(-1deg); box-shadow: 0 12px 35px var(--color-shadow); }
 .play-arrow { display: grid; place-items: center; width: 3.55rem; height: 3.55rem; border-radius: 50%; background: var(--color-primary-contrast); color: var(--color-primary); }
 .play-arrow svg, .primary-button svg, .small-submit svg { width: 1.1rem; height: 1.1rem; }
-.install-link { display: inline-flex; align-items: center; align-self: flex-start; gap: .55rem; width: fit-content; max-width: 100%; margin-top: 1.15rem; padding: .68rem .8rem .68rem .9rem; border: 1px solid color-mix(in srgb, var(--color-primary) 38%, transparent); border-radius: .75rem; background: color-mix(in srgb, var(--color-primary) 9%, transparent); color: var(--color-text); font: .68rem/1.35 'DM Mono', monospace; transition: background .2s, border-color .2s, transform .2s; }
+.install-link { display: inline-flex; align-items: center; align-self: flex-start; gap: .55rem; width: fit-content; max-width: 100%; margin-top: 1.15rem; padding: .68rem .8rem .68rem .9rem; border: 1px solid color-mix(in srgb, var(--color-primary) 38%, transparent); border-radius: .75rem; background: color-mix(in srgb, var(--color-primary) 9%, transparent); color: var(--color-text); font: .68rem/1.35 'DM Mono', monospace; text-align: left; transition: background .2s, border-color .2s, transform .2s; }
 .install-link:hover, .install-link:focus-visible { border-color: color-mix(in srgb, var(--color-primary) 62%, transparent); background: color-mix(in srgb, var(--color-primary) 16%, transparent); transform: translateY(-1px); }
+.install-link:disabled { cursor: wait; opacity: .68; transform: none; }
 .install-link svg, .home-footer svg, .install-back-link svg { width: .9rem; height: .9rem; flex: 0 0 auto; }
 .home-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; position: relative; z-index: 1; color: var(--color-text-faint); font: .58rem 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
 .home-footer a { display: inline-flex; align-items: center; gap: .35rem; color: var(--color-text-muted); white-space: nowrap; }
@@ -166,6 +167,8 @@ h1 em, h2 em { color: var(--color-secondary); font-style: normal; }
   .admin-aside { min-height: 15rem; padding: 1.5rem 1.25rem; }
   .admin-aside-copy { display: none; }
   .admin-aside-tools { gap: .9rem; }
+  .admin-login-grid .admin-aside { display: none; }
+  .admin-login-grid .admin-panel { min-height: calc(100dvh - 4.4rem); padding-top: 2rem; }
   .admin-panel { min-height: calc(100dvh - 15rem); padding: 3.2rem 1.25rem; place-items: start center; }
   .admin-panel h2 { font-size: 3.8rem; }
   .dashboard-header { height: 4.4rem; padding-inline: 1rem; }
