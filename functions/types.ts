@@ -6,6 +6,7 @@ export interface Env {
 export interface CategoryRow {
   id: number;
   name: string;
+  sort_order?: number;
 }
 
 export interface CardRow {

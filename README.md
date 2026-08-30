@@ -30,7 +30,7 @@ npx wrangler d1 migrations apply sip-db --local
 npx wrangler d1 execute sip-db --local --file=seed.sql
 ```
 
-Die lokale Admin-Anmeldung ist `admin` / `admin1234`.
+Die lokale Admin-Anmeldung ist `admin` / `admin1234`. Im Admin-Deck-Studio lassen sich Karten über den Desktop-Drawer oder per Doppelklick inline bearbeiten; auf kleinen Displays öffnet `+` das mobile Bottom-Sheet. `Ctrl/Cmd + K` beziehungsweise `/` fokussiert die Suche, `Esc` schließt offene Editoren.
 
 ## Als App installieren
 
@@ -68,6 +68,15 @@ Die erste Spalte ist der Kategoriename, die zweite der Karteninhalt. Eine Zeile 
    npx wrangler d1 execute sip-db --remote --file=seed.sql
    ```
 
+   Falls `d1 migrations apply --remote` trotz korrekter Anmeldung mit Cloudflare-Fehler 7403 abbricht, kann die einzelne Migration einmalig direkt ausgeführt werden. Danach wird sie manuell als angewendet markiert, damit sie bei späteren Deployments nicht erneut ausgeführt wird:
+
+   ```bash
+   npx wrangler d1 execute sip-db --remote --file=./migrations/0001_category_order.sql
+   npx wrangler d1 execute sip-db --remote --command="INSERT INTO d1_migrations (name, applied_at) VALUES ('0001_category_order.sql', datetime('now'));"
+   ```
+
+   Anschließend sollte `npx wrangler d1 migrations list sip-db --remote` keine offenen Migrationen mehr anzeigen.
+
 4. `SESSION_SECRET` als geheime Production-Variable setzen, zum Beispiel über das Cloudflare-Dashboard unter Pages → Settings → Environment variables. Für lokale Entwicklung ist ein harmloser Fallback vorhanden.
 
 5. Pages-Projekt deployen:
@@ -88,6 +97,6 @@ Die erste Spalte ist der Kategoriename, die zweite der Karteninhalt. Eine Zeile 
 
 - `src/` – React-App und mobile-first Styles
 - `functions/api/` – Cloudflare Pages Functions für Spiel-Daten, Login und Admin-CRUD
-- `migrations/0000_init.sql` – D1-Schema
+- `migrations/0000_init.sql` und `migrations/0001_category_order.sql` – D1-Schema und manuelle Kategorie-Reihenfolge
 - `seed.sql` – Kategorien, Beispielkarten und Admin-Account
 - `public/manifest.webmanifest`, `public/sw.js` – PWA-Setup
