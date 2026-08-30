@@ -1,13 +1,21 @@
 {
+  "id": "/",
   "name": "sip. – Partyspiel",
   "short_name": "sip.",
   "description": "Das entspannte Karten-Partyspiel für deine Runde.",
+  "lang": "de",
+  "dir": "ltr",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#23151a",
-  "theme_color": "#23151a",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "background_color": "#2d2942",
+  "theme_color": "#2d2942",
   "orientation": "portrait",
+  "categories": ["games", "entertainment"],
   "icons": [
-    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "/pwa-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/pwa-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
 }

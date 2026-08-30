@@ -32,6 +32,12 @@ npx wrangler d1 execute sip-db --local --file=seed.sql
 
 Die lokale Admin-Anmeldung ist `admin` / `admin1234`.
 
+## Als App installieren
+
+Die Startseite enthält den Link **Wie installiere ich sip. auf meinem Smartphone?**. Alternativ kann die Anleitung direkt unter `/install` geöffnet werden. Dort wird zwischen Apple/Safari und Android-Browsern unterschieden.
+
+Die PWA-Assets liegen unter `public/`: `manifest.webmanifest`, `favicon.ico`, `favicon.svg`, `apple-touch-icon.png`, `pwa-192x192.png` und `pwa-512x512.png`. Der Service Worker cached den App-Shell inklusive der Installationsseite und Icons.
+
 ## CSV-Import
 
 Im Admin-Bereich können mehrere Karten auf einmal importiert werden. Die Datei muss UTF-8-kodiert sein, `;` als Trennzeichen verwenden und exakt diese Kopfzeile enthalten:
