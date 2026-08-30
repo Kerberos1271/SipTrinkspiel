@@ -144,9 +144,13 @@ body { background: var(--ink); }
 .theme-dark.admin-dashboard .manage-cards { background: #263b46; }
 .manage-cards { background: #e5eef0; }
 
-.install-link { display: inline-flex; align-items: center; gap: .5rem; width: fit-content; max-width: 100%; position: relative; z-index: 1; color: rgba(255,249,239,.72); font: .68rem 'DM Mono', monospace; border-bottom: 1px solid rgba(255,249,239,.2); padding-bottom: .35rem; }
+.install-link { display: inline-flex; align-items: center; gap: .55rem; width: fit-content; max-width: 100%; position: relative; z-index: 1; margin-top: 1.15rem; padding: .68rem .8rem .68rem .9rem; border: 1px solid rgba(227,198,140,.34); border-radius: .75rem; color: rgba(255,249,239,.82); background: rgba(227,198,140,.08); font: .68rem 'DM Mono', monospace; line-height: 1.35; transition: background .2s, border-color .2s, transform .2s; }
+.install-link:hover, .install-link:focus-visible { border-color: rgba(227,198,140,.58); background: rgba(227,198,140,.14); transform: translateY(-1px); }
+.install-link svg { flex: 0 0 auto; }
 .install-link svg { width: .9rem; height: .9rem; }
-.theme-light .install-link { color: rgba(45,41,66,.72); border-color: rgba(45,41,66,.2); }
+.theme-light .install-link { color: rgba(45,41,66,.78); border-color: rgba(45,41,66,.2); background: rgba(227,198,140,.18); }
+.theme-light .install-link:hover, .theme-light .install-link:focus-visible { border-color: rgba(45,41,66,.36); background: rgba(227,198,140,.28); }
+.home-hero .install-link { align-self: flex-start; }
 .install-screen { min-height: 100dvh; color: var(--ink); background: radial-gradient(circle at 88% 12%, rgba(200,111,91,.16), transparent 25%), var(--cream); padding: max(1.5rem, env(safe-area-inset-top)) max(1.25rem, 4vw) max(2rem, env(safe-area-inset-bottom)); }
 .theme-dark.install-screen { color: var(--cream); background: radial-gradient(circle at 88% 12%, rgba(200,111,91,.22), transparent 25%), #302d45; }
 .install-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; max-width: 62rem; margin: 0 auto; }
@@ -208,7 +212,7 @@ body { background: var(--ink); }
 .dashboard-identity { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 @media (max-width: 700px) {
   .home-screen { padding-inline: 1.1rem; }
-  .install-link { font-size: .62rem; }
+  .install-link { max-width: 19rem; font-size: .62rem; }
   .install-content { padding-top: 3.7rem; }
   .install-header .theme-toggle { justify-content: flex-end; }
   .install-step { grid-template-columns: 2.5rem 1fr; padding: 1rem; }

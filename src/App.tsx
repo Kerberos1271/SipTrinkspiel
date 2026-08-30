@@ -117,8 +117,8 @@ function HomeScreen({ theme, onToggleTheme, onPlay }: { theme: Theme; onToggleTh
       <h1>Gute Leute.<br /><em>Gute Ausreden.</em><br />Ein Drink.</h1>
       <p className="hero-copy">Das Karten-Partyspiel, bei dem jede Runde ein bisschen anders läuft.</p>
       <button className="play-button" type="button" onClick={onPlay}><span>Play</span><span className="play-arrow"><ArrowIcon /></span></button>
+      <a className="install-link" href="/install">Wie installiere ich sip. auf meinem Smartphone? <ArrowIcon /></a>
     </section>
-    <a className="install-link" href="/install">Wie installiere ich sip. auf meinem Smartphone? <ArrowIcon /></a>
     <footer className="home-footer"><span>Kein Login. Kein Score.</span><a href="/admin">Admin Login <ArrowIcon /></a></footer>
   </AppFrame>;
 }
