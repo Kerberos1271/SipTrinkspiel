@@ -76,7 +76,7 @@ h1 em, h2 em { color: var(--color-secondary); font-style: normal; }
 .eyebrow > span { width: 1.65rem; height: 1px; display: inline-block; background: var(--color-secondary); }
 .eyebrow.dark { color: var(--color-text-subtle); }
 
-.home-screen { display: flex; flex-direction: column; padding: max(1.6rem, env(safe-area-inset-top)) 1.4rem max(1.2rem, env(safe-area-inset-bottom)); background: transparent; }
+.home-screen { display: flex; flex-direction: column; width: 100%; height: 100dvh; min-height: 100dvh; overflow: hidden; padding: max(1.6rem, env(safe-area-inset-top)) 1.4rem max(1.2rem, env(safe-area-inset-bottom)); background: transparent; }
 .home-header, .screen-header, .install-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; position: relative; z-index: 1; }
 .home-tools, .screen-header-right { display: flex; align-items: center; gap: .9rem; }
 .ambient-orb { display: none; position: absolute; border-radius: 50%; filter: blur(1px); opacity: .55; pointer-events: none; }
@@ -159,6 +159,11 @@ h1 em, h2 em { color: var(--color-secondary); font-style: normal; }
 @media (max-width: 900px) { .csv-import-card { grid-template-columns: 1fr 1fr; }.csv-file-button { grid-column: 1 / -1; justify-content: center; } }
 @media (max-width: 700px) {
   .home-screen { padding-inline: 1.1rem; }
+  .home-hero { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; justify-content: center; padding: clamp(1rem, 5vh, 2.5rem) 0 clamp(.75rem, 3vh, 1.5rem); }
+  .home-hero h1 { margin-block: .9rem; font-size: clamp(2.75rem, 13vw, 4.5rem); }
+  .play-button { height: 3.8rem; margin-top: 1.35rem; }
+  .play-arrow { width: 3.1rem; height: 3.1rem; }
+  .install-link { margin-top: .7rem; }
   .install-link { max-width: 19rem; font-size: .62rem; }
   .screen-header-right, .game-header-right { gap: .45rem; }
   .game-header { gap: .35rem; }
@@ -195,6 +200,15 @@ h1 em, h2 em { color: var(--color-secondary); font-style: normal; }
   .install-step { grid-template-columns: 2.5rem 1fr; padding: 1rem; }
   .install-step-number { width: 2.15rem; height: 2.15rem; }
   .install-step h2 { font-size: 1.15rem; }
+}
+@media (max-width: 700px) and (max-height: 700px) {
+  .home-screen { padding-top: max(.85rem, env(safe-area-inset-top)); padding-bottom: max(.65rem, env(safe-area-inset-bottom)); }
+  .home-hero { padding-block: .5rem; }
+  .home-hero h1 { margin-block: .6rem; font-size: clamp(2.6rem, 12.5vw, 3.9rem); }
+  .hero-copy { font-size: .84rem; line-height: 1.4; }
+  .play-button { height: 3.5rem; margin-top: .9rem; }
+  .play-arrow { width: 2.85rem; height: 2.85rem; }
+  .install-link { margin-top: .4rem; padding-block: .5rem; }
 }
 @media (min-width: 701px) { .home-screen { padding-right: clamp(2rem, 7vw, 8rem); padding-left: clamp(2rem, 7vw, 8rem); }.setup-content { padding-top: 6rem; }.game-screen { padding-right: clamp(2rem, 8vw, 9rem); padding-left: clamp(2rem, 8vw, 9rem); }.prompt-card { min-height: min(67dvh, 40rem); } }
 
@@ -362,7 +376,7 @@ button:active:not(:disabled), a:active { transform: scale(.97); }
   .admin-card { padding: 1.1rem; overflow: hidden; }
   .dashboard-content { width: 100%; padding-inline: 1rem; }
   .dashboard-header { padding-inline: 1rem; }
-  .admin-columns { display: block; }
+  .admin-columns { display: flex; flex-direction: column; gap: 1rem; }
   .admin-card { width: 100%; max-width: 100%; }
   .manage-cards { order: -1; }
   .desktop-create-button { display: inline-flex; min-height: 44px; padding-inline: .8rem; }
