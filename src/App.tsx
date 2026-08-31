@@ -207,14 +207,14 @@ function InstallGuide({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: (
   const [device, setDevice] = useState<'ios' | 'android'>(() => /iphone|ipad|ipod/i.test(navigator.userAgent) ? 'ios' : 'android');
   const steps = device === 'ios'
     ? [
-        ['01', 'Teilen öffnen', 'Tippe in Safari auf das Teilen-Symbol – das Quadrat mit dem Pfeil nach oben.'],
-        ['02', 'Zum Home-Bildschirm', 'Scrolle im Menü nach unten und wähle „Zum Home-Bildschirm“.'],
-        ['03', 'Hinzufügen', 'Bestätige mit „Hinzufügen“. sip. erscheint danach wie eine normale App auf deinem Home-Bildschirm.'],
+        ['01', 'Website in Safari öffnen', 'Öffne sip. in Safari und tippe auf das Teilen-Symbol – das Quadrat mit dem Pfeil nach oben. Je nach Safari-Layout findest du es oben oder unten.'],
+        ['02', 'Zu Home-Bildschirm hinzufügen', 'Scrolle in der Liste nach unten und tippe auf „Zu Home-Bildschirm hinzufügen“. Wird die Option nicht angezeigt, scrolle bis zum Ende, tippe auf „Aktionen bearbeiten“ und füge sie hinzu.'],
+        ['03', 'Als Web-App öffnen', 'Aktiviere „Als Web-App öffnen“ und tippe anschließend oben rechts auf „Hinzufügen“. Das sip.-Symbol erscheint danach auf deinem Home-Bildschirm.'],
       ]
     : [
-        ['01', 'Browser-Menü öffnen', 'Tippe auf die drei Punkte im Browser-Menü – je nach Browser oben oder unten.'],
-        ['02', 'App installieren', 'Wähle „App installieren“ oder „Zum Startbildschirm hinzufügen“.'],
-        ['03', 'Bestätigen', 'Bestätige die Auswahl. sip. ist danach direkt über deinen Startbildschirm erreichbar.'],
+        ['01', 'Browser-Menü öffnen', 'Öffne sip. in deinem Browser und tippe auf die drei Punkte im Menü – je nach Browser oben oder unten.'],
+        ['02', 'App installieren', 'Tippe auf „App installieren“ oder – je nach Gerät und Browser – auf „Zum Startbildschirm hinzufügen“.'],
+        ['03', 'Installation bestätigen', 'Bestätige mit „Installieren“ oder „Hinzufügen“. Danach findest du sip. auf deinem Startbildschirm und kannst es wie eine App öffnen.'],
       ];
   return <AppFrame theme={theme} className="install-screen">
     <header className="install-header"><a className="back-button" href="/" aria-label="Zurück zur Startseite"><span aria-hidden="true">←</span> Zurück</a><Logo light={theme === 'dark'} /><ThemeToggle theme={theme} onToggle={onToggleTheme} /></header>
