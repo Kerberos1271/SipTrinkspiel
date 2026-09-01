@@ -10,5 +10,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 );
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+  window.addEventListener('load', () => {
+    const serviceWorkerUrl = `/sw.js?v=${encodeURIComponent(__APP_VERSION__)}`;
+    navigator.serviceWorker.register(serviceWorkerUrl, { updateViaCache: 'none' })
+      .then((registration) => registration.update())
+      .catch(() => undefined);
+  });
 }
