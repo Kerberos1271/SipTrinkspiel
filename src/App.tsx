@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { normalizePlaceholders, replacePlayerPlaceholders, sanitizeQuestion } from './placeholders';
 
 type Category = { id: number; name: string };
 type Card = { id: number; text: string; category_id: number; category_name?: string };
@@ -26,11 +27,11 @@ const fallbackData: GameData = {
   cards: [
     { id: 1, category_id: 1, text: 'Wer würde am ehesten spontan ein Tattoo stechen lassen? Zeigt auf die Person – sie nimmt einen Schluck.' },
     { id: 2, category_id: 1, text: 'Was war dein peinlichster Party-Moment? Die Runde entscheidet, ob die Story einen Schluck wert ist.' },
-    { id: 3, category_id: 1, text: '${player} verteilt zwei Schlücke – an wen und warum?' },
+    { id: 3, category_id: 1, text: '#player verteilt zwei Schlücke – an wen und warum?' },
     { id: 4, category_id: 2, text: 'Alle stoßen an. Die letzte Person, die ihr Glas hebt, trinkt.' },
     { id: 5, category_id: 2, text: 'Die Person mit dem längsten Vornamen startet eine Runde: reihum ein Wort, bis jemand lacht.' },
     { id: 6, category_id: 3, text: 'Mach den besten Party-Sound, den du kannst. Die leiseste Reaktion trinkt.' },
-    { id: 7, category_id: 3, text: '${player}, wähle eine Person. Ihr nehmt gleichzeitig einen Schluck.' },
+    { id: 7, category_id: 3, text: '#player, wähle eine Person. Ihr nehmt gleichzeitig einen Schluck.' },
   ],
 };
 
@@ -157,7 +158,7 @@ function PlayerApp({ theme, onToggleTheme, pwaInstall }: { theme: Theme; onToggl
   useEffect(() => {
     api<GameData>('/api/game').then((remote) => {
       if (remote.categories?.length) {
-        setData(remote);
+        setData({ ...remote, cards: remote.cards.map((card) => ({ ...card, text: normalizePlaceholders(card.text) })) });
         setActiveCategoryIds(remote.categories.map((category) => category.id));
       }
     }).catch(() => undefined).finally(() => setLoadState('ready'));
@@ -169,7 +170,7 @@ function PlayerApp({ theme, onToggleTheme, pwaInstall }: { theme: Theme; onToggl
       const swapIndex = Math.floor(Math.random() * (index + 1));
       [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
     }
-    setDeck(shuffled.map((card) => ({ ...card, text: card.text.replaceAll('${player}', players[Math.floor(Math.random() * players.length)]) })));
+    setDeck(shuffled.map((card) => ({ ...card, text: replacePlayerPlaceholders(card.text, players) })));
     setScreen('game');
   };
 
@@ -333,7 +334,7 @@ function AdminDashboard({ theme, onToggleTheme, username, onLogout }: { theme: T
     try {
       const [categoryResult, cardResult] = await Promise.all([api<{ categories: Category[] }>('/api/admin/categories'), api<{ cards: Card[] }>('/api/admin/cards')]);
       setCategories(categoryResult.categories);
-      setCards(cardResult.cards);
+      setCards(cardResult.cards.map((card) => ({ ...card, text: sanitizeQuestion(card.text) })));
       if (!categoryResult.categories.some((category) => String(category.id) === selectedCategory)) setSelectedCategory(categoryResult.categories[0] ? String(categoryResult.categories[0].id) : '');
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : 'Daten konnten nicht geladen werden.');
@@ -355,7 +356,7 @@ function AdminDashboard({ theme, onToggleTheme, username, onLogout }: { theme: T
 
   const addCategory = async (event: React.FormEvent) => { event.preventDefault(); if (!categoryName.trim()) return; try { await api('/api/admin/categories', { method: 'POST', body: JSON.stringify({ name: categoryName }) }); setCategoryName(''); setError(''); setNotice('Kategorie angelegt.'); await refresh(); } catch (addError) { setError(addError instanceof Error ? addError.message : 'Kategorie konnte nicht angelegt werden.'); } };
   const deleteCategory = async (category: Category) => { try { await api(`/api/admin/categories/${category.id}`, { method: 'DELETE' }); setError(''); setNotice('Kategorie und Karten gelöscht.'); await refresh(); } catch (deleteError) { setError(deleteError instanceof Error ? deleteError.message : 'Löschen fehlgeschlagen.'); } };
-  const addCard = async (event: React.FormEvent) => { event.preventDefault(); if (!cardText.trim() || !selectedCategory) return; try { await api('/api/admin/cards', { method: 'POST', body: JSON.stringify({ text: cardText, category_id: Number(selectedCategory) }) }); setCardText(''); setError(''); setNotice('Karte angelegt.'); await refresh(); } catch (addError) { setError(addError instanceof Error ? addError.message : 'Karte konnte nicht angelegt werden.'); } };
+  const addCard = async (event: React.FormEvent) => { event.preventDefault(); const text = sanitizeQuestion(cardText); if (!text || !selectedCategory) return; try { await api('/api/admin/cards', { method: 'POST', body: JSON.stringify({ text, category_id: Number(selectedCategory) }) }); setCardText(''); setError(''); setNotice('Karte angelegt.'); await refresh(); } catch (addError) { setError(addError instanceof Error ? addError.message : 'Karte konnte nicht angelegt werden.'); } };
   const deleteCard = async (card: Card) => { try { await api(`/api/admin/cards/${card.id}`, { method: 'DELETE' }); setError(''); setNotice('Karte gelöscht.'); await refresh(); } catch (deleteError) { setError(deleteError instanceof Error ? deleteError.message : 'Löschen fehlgeschlagen.'); } };
   const importCsv = async (event: React.ChangeEvent<HTMLInputElement>) => { const file = event.target.files?.[0]; if (!file) return; setImporting(true); setError(''); try { const result = await api<{ importedCards: number; skippedRows: number; createdCategories: number }>('/api/admin/import', { method: 'POST', body: JSON.stringify({ csv: await file.text() }) }); setNotice(`${result.importedCards} Karten importiert${result.skippedRows ? `, ${result.skippedRows} fehlerhafte Zeile${result.skippedRows === 1 ? '' : 'n'} übersprungen` : ''}${result.createdCategories ? `, ${result.createdCategories} Kategorien neu angelegt` : ''}.`); await refresh(); } catch (importError) { setError(importError instanceof Error ? importError.message : 'CSV konnte nicht importiert werden.'); } finally { setImporting(false); event.target.value = ''; } };
   const logout = async () => { await api('/api/auth/me', { method: 'POST' }).catch(() => undefined); onLogout(); };
@@ -369,7 +370,7 @@ function AdminDashboard({ theme, onToggleTheme, username, onLogout }: { theme: T
       <nav className="dashboard-tabs" aria-label="Adminbereiche"><button type="button" className={activeTab === 'deck' ? 'active' : ''} onClick={() => setActiveTab('deck')}>Deck verwalten <span>{cards.length}</span></button><button type="button" className={activeTab === 'import' ? 'active' : ''} onClick={() => setActiveTab('import')}>CSV importieren</button></nav>
       {activeTab === 'import' ? <CsvImportPanel onImport={importCsv} importing={importing} /> : <div className="admin-columns">
         <section className="admin-card manage-categories"><div className="admin-card-heading"><div><span className="card-kicker">Kategorien</span><h2>Ordnung<br /><em>schaffen.</em></h2></div><span className="heading-icon">✳</span></div><form className="inline-form" onSubmit={addCategory}><input value={categoryName} onChange={(event) => setCategoryName(event.target.value)} maxLength={60} placeholder="Neue Kategorie" /><button type="submit" aria-label="Kategorie hinzufügen">+</button></form><div className="admin-category-list">{categories.map((category, index) => <div className="admin-category-row" key={category.id}><span className={`category-marker marker-${colors[index % colors.length]}`} /><span>{category.name}</span><span className="category-card-count">{cards.filter((card) => card.category_id === category.id).length} Karten</span><button type="button" className="row-delete" onClick={() => deleteCategory(category)} aria-label={`${category.name} löschen`}>×</button></div>)}</div></section>
-        <section className="admin-card manage-cards"><div className="admin-card-heading"><div><span className="card-kicker">Karten</span><h2>Die guten<br /><em>Fragen.</em></h2></div><span className="heading-icon">✦</span></div><form className="card-create-form" onSubmit={addCard}><textarea value={cardText} onChange={(event) => setCardText(event.target.value)} maxLength={500} placeholder="Neue Karte schreiben …  (Tipp: ${player} wird im Spiel ersetzt)" rows={3} autoComplete="off" inputMode="text" /><div className="form-row"><select value={selectedCategory} onChange={(event) => setSelectedCategory(event.target.value)} aria-label="Kategorie wählen"><option value="" disabled>Kategorie wählen</option>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select><button className="small-submit" type="submit">Hinzufügen <ArrowIcon /></button></div></form>
+        <section className="admin-card manage-cards"><div className="admin-card-heading"><div><span className="card-kicker">Karten</span><h2>Die guten<br /><em>Fragen.</em></h2></div><span className="heading-icon">✦</span></div><form className="card-create-form" onSubmit={addCard}><textarea value={cardText} onChange={(event) => setCardText(event.target.value)} maxLength={500} placeholder="Neue Karte schreiben …  (Tipp: #player wird im Spiel ersetzt)" rows={3} autoComplete="off" inputMode="text" /><div className="form-row"><select value={selectedCategory} onChange={(event) => setSelectedCategory(event.target.value)} aria-label="Kategorie wählen"><option value="" disabled>Kategorie wählen</option>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select><button className="small-submit" type="submit">Hinzufügen <ArrowIcon /></button></div></form>
           <div className="card-filter"><button type="button" className={filter === 'all' ? 'active' : ''} onClick={() => changeFilter('all')}>Alle <span>{cards.length}</span></button>{categories.map((category) => <button type="button" className={filter === String(category.id) ? 'active' : ''} onClick={() => changeFilter(String(category.id))} key={category.id}>{category.name} <span>{cards.filter((card) => card.category_id === category.id).length}</span></button>)}</div>
           <div className="card-list-tools"><label className="card-search"><span aria-hidden="true">⌕</span><input type="search" value={searchQuery} onChange={(event) => changeSearch(event.target.value)} placeholder="Fragen durchsuchen …" aria-label="Fragen durchsuchen" autoComplete="off" inputMode="search" enterKeyHint="search" /></label><span className="result-count">{filteredCards.length} Treffer</span></div>
           <div className="admin-card-list">{visibleCards.map((card) => <div className="admin-prompt-row" key={card.id}><div><span className="prompt-category">{card.category_name}</span><p>{card.text}</p></div><button type="button" className="row-delete" onClick={() => deleteCard(card)} aria-label="Karte löschen">×</button></div>)}{!visibleCards.length && <p className="empty-state">Keine Karten für diese Suche.</p>}</div>
@@ -383,12 +384,12 @@ function AdminDashboard({ theme, onToggleTheme, username, onLogout }: { theme: T
 type DuplicateWarning = { kind: 'exact' | 'similar'; card: Card } | null;
 
 function CardText({ text }: { text: string }) {
-  const parts = text.split(/(\$\{player2?\})/g);
-  return <>{parts.map((part, index) => part.match(/^\$\{player2?\}$/) ? <span className="placeholder-token" key={`${part}-${index}`}>{part}</span> : <span key={`${part}-${index}`}>{part}</span>)}</>;
+  const parts = text.split(/(#player\d*|\$\{player\d*\})/g);
+  return <>{parts.map((part, index) => part.match(/^#player\d*$|^\$\{player\d*\}$/) ? <span className="placeholder-token" key={`${part}-${index}`}>{part}</span> : <span key={`${part}-${index}`}>{part}</span>)}</>;
 }
 
 function normalizeCardText(value: string) {
-  return value.toLocaleLowerCase().replaceAll('${player}', 'player').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  return normalizePlaceholders(value).toLocaleLowerCase().replace(/#player\d*/g, 'player').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
 }
 
 function findDuplicate(cards: Card[], text: string, excludedId?: number): DuplicateWarning {
@@ -417,15 +418,16 @@ function CardEditorDrawer({ open, mode, text, categoryId, categories, duplicateW
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => { if (open) window.setTimeout(() => textareaRef.current?.focus(), 80); }, [open]);
   if (!open) return null;
-  const previewText = text.trim() ? (() => { let playerIndex = 0; const dummyPlayers = ['Mia', 'Alex', 'Sam']; return text.replace(/\$\{player\}/g, () => dummyPlayers[playerIndex++ % dummyPlayers.length]); })() : 'Deine Frage erscheint hier …';
+  const previewText = text.trim() ? replacePlayerPlaceholders(text, ['Mia', 'Alex', 'Sam']) : 'Deine Frage erscheint hier …';
   const previewCategory = categories.find((category) => String(category.id) === categoryId)?.name || 'Fragen';
   const insertPlaceholder = () => {
     const textarea = textareaRef.current;
     const start = textarea?.selectionStart ?? text.length;
     const end = textarea?.selectionEnd ?? text.length;
-    const nextText = `${text.slice(0, start)}\${player}${text.slice(end)}`;
+    const placeholder = '#player';
+    const nextText = `${text.slice(0, start)}${placeholder}${text.slice(end)}`;
     onTextChange(nextText);
-    window.requestAnimationFrame(() => { textareaRef.current?.focus(); textareaRef.current?.setSelectionRange(start + 9, start + 9); });
+    window.requestAnimationFrame(() => { textareaRef.current?.focus(); textareaRef.current?.setSelectionRange(start + placeholder.length, start + placeholder.length); });
   };
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Escape') { event.preventDefault(); onClose(); }
@@ -436,9 +438,9 @@ function CardEditorDrawer({ open, mode, text, categoryId, categories, duplicateW
     <form className="card-editor-form" onSubmit={(event) => { event.preventDefault(); onSubmit(); }}>
       <div className="card-editor-scroll">
       <label className="editor-field-label" htmlFor="card-editor-text">Karteninhalt</label>
-      <div className="placeholder-tools"><span>Einfügen:</span><button type="button" onClick={insertPlaceholder}><code>${'{player}'}</code><span>Spielername</span></button></div>
+      <div className="placeholder-tools"><span>Einfügen:</span><button type="button" onClick={insertPlaceholder}><code>#player</code><span>Spielername</span></button></div>
       <textarea ref={textareaRef} id="card-editor-text" value={text} onChange={(event) => onTextChange(event.target.value)} onKeyDown={handleKeyDown} maxLength={500} rows={5} autoComplete="off" inputMode="text" aria-describedby="card-editor-hint" placeholder="Schreibe eine Frage …" />
-      <p id="card-editor-hint" className="editor-hint">Tipp: <code>${'{player}'}</code> wird im Spiel zufällig durch einen Namen ersetzt. <kbd>Enter</kbd> speichert, <kbd>Shift + Enter</kbd> macht einen Zeilenumbruch.</p>
+      <p id="card-editor-hint" className="editor-hint">Tipp: <code>#player</code> wird im Spiel zufällig durch einen Namen ersetzt. Auch <code>#player1</code>, <code>#player2</code> usw. werden unterstützt. <kbd>Enter</kbd> speichert, <kbd>Shift + Enter</kbd> macht einen Zeilenumbruch.</p>
       {duplicateWarning && <p className={`duplicate-warning ${duplicateWarning.kind === 'exact' ? 'is-exact' : ''}`} role="alert">{duplicateWarning.kind === 'exact' ? 'Diese Frage gibt es bereits.' : 'Diese Frage klingt sehr ähnlich wie:'}<strong>„{duplicateWarning.card.text}“</strong></p>}
       <label className="editor-field-label" htmlFor="card-editor-category">Kategorie</label>
       <select id="card-editor-category" value={categoryId} onChange={(event) => onCategoryChange(event.target.value)}>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select>
@@ -533,7 +535,7 @@ function AdminDashboardEnhanced({ theme, onToggleTheme, username, onLogout }: { 
   const refresh = async () => {
     try {
       const [categoryResult, cardResult] = await Promise.all([api<{ categories: Category[] }>('/api/admin/categories'), api<{ cards: Card[] }>('/api/admin/cards')]);
-      setCategories(categoryResult.categories); setCards(cardResult.cards);
+      setCategories(categoryResult.categories); setCards(cardResult.cards.map((card) => ({ ...card, text: sanitizeQuestion(card.text) })));
       if (!categoryResult.categories.some((category) => String(category.id) === editorCategory)) setEditorCategory(categoryResult.categories[0] ? String(categoryResult.categories[0].id) : '');
     } catch (loadError) { showToast(loadError instanceof Error ? loadError.message : 'Daten konnten nicht geladen werden.', 'error'); }
   };
@@ -558,13 +560,16 @@ function AdminDashboardEnhanced({ theme, onToggleTheme, username, onLogout }: { 
   const closeEditor = () => { setEditorMode(null); setEditorCardId(null); };
   const currentDuplicate = useMemo(() => findDuplicate(cards, editorText, editorCardId ?? undefined), [cards, editorText, editorCardId]);
   const submitEditor = async () => {
-    if (!editorText.trim() || !editorCategory) return;
+    const text = sanitizeQuestion(editorText);
+    if (!text || !editorCategory) return;
     if (currentDuplicate?.kind === 'exact') { showToast('Diese Frage existiert bereits und wurde nicht gespeichert.', 'error'); return; }
-    try { await api(editorMode === 'edit' ? `/api/admin/cards/${editorCardId}` : '/api/admin/cards', { method: editorMode === 'edit' ? 'PUT' : 'POST', body: JSON.stringify({ text: editorText, category_id: Number(editorCategory) }) }); showToast(editorMode === 'edit' ? 'Karte aktualisiert.' : 'Karte angelegt.'); closeEditor(); await refresh(); } catch (saveError) { showToast(saveError instanceof Error ? saveError.message : 'Karte konnte nicht gespeichert werden.', 'error'); }
+    try { await api(editorMode === 'edit' ? `/api/admin/cards/${editorCardId}` : '/api/admin/cards', { method: editorMode === 'edit' ? 'PUT' : 'POST', body: JSON.stringify({ text, category_id: Number(editorCategory) }) }); showToast(editorMode === 'edit' ? 'Karte aktualisiert.' : 'Karte angelegt.'); closeEditor(); await refresh(); } catch (saveError) { showToast(saveError instanceof Error ? saveError.message : 'Karte konnte nicht gespeichert werden.', 'error'); }
   };
   const saveInlineCard = async (id: number, text: string, categoryId: number) => {
-    if (findDuplicate(cards, text, id)?.kind === 'exact') { showToast('Diese Frage existiert bereits.', 'error'); return false; }
-    try { await api(`/api/admin/cards/${id}`, { method: 'PUT', body: JSON.stringify({ text, category_id: categoryId }) }); showToast('Karte aktualisiert.'); await refresh(); return true; } catch (saveError) { showToast(saveError instanceof Error ? saveError.message : 'Karte konnte nicht aktualisiert werden.', 'error'); return false; }
+    const normalizedText = sanitizeQuestion(text);
+    if (!normalizedText) return false;
+    if (findDuplicate(cards, normalizedText, id)?.kind === 'exact') { showToast('Diese Frage existiert bereits.', 'error'); return false; }
+    try { await api(`/api/admin/cards/${id}`, { method: 'PUT', body: JSON.stringify({ text: normalizedText, category_id: categoryId }) }); showToast('Karte aktualisiert.'); await refresh(); return true; } catch (saveError) { showToast(saveError instanceof Error ? saveError.message : 'Karte konnte nicht aktualisiert werden.', 'error'); return false; }
   };
   const addCategory = async (event: React.FormEvent) => { event.preventDefault(); if (!categoryName.trim()) return; try { await api('/api/admin/categories', { method: 'POST', body: JSON.stringify({ name: categoryName }) }); setCategoryName(''); showToast('Kategorie angelegt.'); await refresh(); } catch (addError) { showToast(addError instanceof Error ? addError.message : 'Kategorie konnte nicht angelegt werden.', 'error'); } };
   const renameCategory = async (id: number, name: string) => { try { await api(`/api/admin/categories/${id}`, { method: 'PUT', body: JSON.stringify({ name }) }); showToast('Kategorie umbenannt.'); await refresh(); return true; } catch (renameError) { showToast(renameError instanceof Error ? renameError.message : 'Kategorie konnte nicht umbenannt werden.', 'error'); return false; } };

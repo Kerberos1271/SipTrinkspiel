@@ -2,6 +2,7 @@ import type { PagesFunction } from '@cloudflare/workers-types';
 import type { Env, CategoryRow } from '../../types';
 import { requireAdmin } from '../../lib/auth';
 import { json, readJson } from '../../lib/http';
+import { sanitizeQuestion } from '../../lib/placeholders';
 
 interface ImportBody { csv?: string }
 interface ImportRow { categoryName: string; cardText: string }
@@ -88,7 +89,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const row = rows[index];
     if (row.length !== 2) { skippedRows += 1; continue; }
     const categoryName = row[0].trim();
-    const cardText = row[1].trim();
+    const cardText = sanitizeQuestion(row[1]);
     if (!categoryName || !cardText || categoryName.length > 60 || cardText.length > 500) { skippedRows += 1; continue; }
     importRows.push({ categoryName, cardText });
   }

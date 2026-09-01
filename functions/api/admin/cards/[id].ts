@@ -2,6 +2,7 @@ import type { PagesFunction } from '@cloudflare/workers-types';
 import type { Env } from '../../../types';
 import { requireAdmin } from '../../../lib/auth';
 import { json, readJson } from '../../../lib/http';
+import { sanitizeQuestion } from '../../../lib/placeholders';
 
 interface CardBody { text?: string; category_id?: number }
 
@@ -19,7 +20,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   if (auth instanceof Response) return auth;
   const id = Number(context.params.id);
   const body = await readJson<CardBody>(context.request);
-  const text = body?.text?.trim();
+  const text = sanitizeQuestion(body?.text);
   const categoryId = Number(body?.category_id);
   if (!Number.isInteger(id) || !text || text.length > 500 || !Number.isInteger(categoryId)) return json({ error: 'Bitte Text und Kategorie ausfüllen.' }, { status: 400 });
   const category = await context.env.DB.prepare('SELECT id FROM categories WHERE id = ?1').bind(categoryId).first();
