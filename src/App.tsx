@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { normalizePlaceholders, PlayerDrawPool, replacePlayerPlaceholders, resetPlayerPool, sanitizeQuestion } from './placeholders';
 import { useFitText } from './useFitText';
 
@@ -19,6 +19,8 @@ interface BeforeInstallPromptEvent extends Event {
 type StandaloneNavigator = Navigator & { standalone?: boolean };
 
 const PAGE_SIZE = 15;
+const DATA_CACHE_TTL = 1000 * 60 * 60 * 24;
+const GAME_DATA_CACHE_KEY = 'sip-game-data-v1';
 const fallbackData: GameData = {
   categories: [
     { id: 1, name: 'Fragen' },
@@ -38,15 +40,85 @@ const fallbackData: GameData = {
 
 const colors = ['lime', 'coral', 'sky'];
 
+function isGameData(value: unknown): value is GameData {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as { categories?: unknown; cards?: unknown };
+  return Array.isArray(candidate.categories)
+    && candidate.categories.every((category) => {
+      if (!category || typeof category !== 'object') return false;
+      const item = category as Partial<Category>;
+      return typeof item.id === 'number' && typeof item.name === 'string';
+    })
+    && Array.isArray(candidate.cards)
+    && candidate.cards.every((card) => {
+      if (!card || typeof card !== 'object') return false;
+      const item = card as Partial<Card>;
+      return typeof item.id === 'number'
+        && typeof item.text === 'string'
+        && typeof item.category_id === 'number';
+    });
+}
+
+function normalizeGameData(value: GameData): GameData {
+  return {
+    categories: value.categories,
+    cards: value.cards.map((card) => ({ ...card, text: sanitizeQuestion(card.text) })),
+  };
+}
+
+type GameDataCache = { data: GameData; cachedAt: number } | null;
+
+function readGameDataCache(): GameDataCache {
+  if (typeof window === 'undefined') return null;
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(GAME_DATA_CACHE_KEY) || 'null') as unknown;
+    if (isGameData(stored)) return { data: normalizeGameData(stored), cachedAt: 0 };
+    if (!stored || typeof stored !== 'object') return null;
+    const cached = stored as { data?: unknown; cachedAt?: unknown };
+    return isGameData(cached.data) && typeof cached.cachedAt === 'number'
+      ? { data: normalizeGameData(cached.data), cachedAt: cached.cachedAt }
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchGameDataFromNetwork(): Promise<GameData> {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 3500);
+  try {
+    const response = await fetch(`/api/game?revalidate=${Date.now()}`, {
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { Accept: 'application/json', 'X-Sip-Revalidate': '1' },
+      signal: controller.signal,
+    });
+    const data = await response.json().catch(() => null) as unknown;
+    if (response.status !== 200 || response.headers.get('X-Sip-Cache-Fallback') === '1' || !isGameData(data)) {
+      throw new Error('Spieldaten konnten nicht erfolgreich aktualisiert werden.');
+    }
+    return normalizeGameData(data);
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(path, {
-    credentials: 'same-origin',
-    headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
-    ...init,
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || 'Etwas ist schiefgelaufen.');
-  return data as T;
+  try {
+    const response = await fetch(path, {
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
+      ...init,
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'Etwas ist schiefgelaufen.');
+    return data as T;
+  } catch (error) {
+    if (error instanceof TypeError) {
+      throw new Error('Keine Netzwerkverbindung. Diese Aktion ist offline nicht verfügbar.');
+    }
+    throw error;
+  }
 }
 
 function Logo({ light = false }: { light?: boolean }) {
@@ -150,22 +222,49 @@ function App() {
 
 function PlayerApp({ theme, onToggleTheme, pwaInstall }: { theme: Theme; onToggleTheme: () => void; pwaInstall: ReturnType<typeof usePwaInstall> }) {
   const [screen, setScreen] = useState<Screen>('home');
-  const [data, setData] = useState<GameData>(fallbackData);
+  const initialCacheRef = useRef<GameDataCache | undefined>(undefined);
+  if (initialCacheRef.current === undefined) initialCacheRef.current = readGameDataCache();
+  const initialCache = initialCacheRef.current;
+  const [data, setData] = useState<GameData>(() => initialCache?.data || fallbackData);
   const [players, setPlayers] = useState<string[]>(['Mia', 'Tom']);
-  const [activeCategoryIds, setActiveCategoryIds] = useState<number[]>(fallbackData.categories.map((category) => category.id));
+  const [activeCategoryIds, setActiveCategoryIds] = useState<number[]>(() => data.categories.map((category) => category.id));
   const [deck, setDeck] = useState<Card[]>([]);
   const [loadState, setLoadState] = useState<'loading' | 'ready'>('loading');
+  const refreshInFlightRef = useRef(false);
   const playerPoolRef = useRef<PlayerDrawPool | null>(null);
   if (!playerPoolRef.current) playerPoolRef.current = new PlayerDrawPool(players);
 
-  useEffect(() => {
-    api<GameData>('/api/game').then((remote) => {
-      if (remote.categories?.length) {
-        setData({ ...remote, cards: remote.cards.map((card) => ({ ...card, text: normalizePlaceholders(card.text) })) });
-        setActiveCategoryIds(remote.categories.map((category) => category.id));
-      }
-    }).catch(() => undefined).finally(() => setLoadState('ready'));
+  const refreshGameDataIfNeeded = useCallback(async () => {
+    if (!navigator.onLine) { setLoadState('ready'); return; }
+    if (refreshInFlightRef.current) return;
+
+    const cached = readGameDataCache();
+    const cacheIsFresh = cached && cached.cachedAt > 0 && Date.now() - cached.cachedAt < DATA_CACHE_TTL;
+    if (cacheIsFresh) { setLoadState('ready'); return; }
+
+    refreshInFlightRef.current = true;
+    try {
+      const nextData = await fetchGameDataFromNetwork();
+      const nextCache = { data: nextData, cachedAt: Date.now() };
+      // Only this successful, validated response can replace the old cache.
+      try { window.localStorage.setItem(GAME_DATA_CACHE_KEY, JSON.stringify(nextCache)); } catch { /* Keep the previous cache if storage is unavailable. */ }
+      setData(nextData);
+      setActiveCategoryIds(nextData.categories.map((category) => category.id));
+    } catch {
+      // Keep the current state and the previous localStorage snapshot untouched.
+    } finally {
+      refreshInFlightRef.current = false;
+      setLoadState('ready');
+    }
   }, []);
+
+  useEffect(() => { void refreshGameDataIfNeeded(); }, [refreshGameDataIfNeeded]);
+
+  useEffect(() => {
+    const revalidateOnResume = () => { void refreshGameDataIfNeeded(); };
+    window.addEventListener('sip-app-resume', revalidateOnResume);
+    return () => window.removeEventListener('sip-app-resume', revalidateOnResume);
+  }, [refreshGameDataIfNeeded]);
 
   useEffect(() => {
     if (playerPoolRef.current) resetPlayerPool(playerPoolRef.current, players);
