@@ -126,16 +126,54 @@ function Logo({ light = false }: { light?: boolean }) {
 }
 
 function ArrowIcon() {
-  return <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10.5 4.5 16 10l-5.5 5.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+  return <svg className="ui-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10.5 4.5 16 10l-5.5 5.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+}
+
+function BackIcon() {
+  return <svg className="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+}
+
+function CloseIcon() {
+  return <svg className="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>;
+}
+
+function PlusIcon() {
+  return <svg className="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>;
+}
+
+function CheckIcon() {
+  return <svg className="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+}
+
+function ChevronIcon({ direction }: { direction: 'up' | 'down' }) {
+  return <svg className="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={direction === 'up' ? 'm6 15 6-6 6 6' : 'm6 9 6 6 6-6'} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+}
+
+function SearchIcon() {
+  return <svg className="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="m16 16 4.5 4.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>;
+}
+
+function EditIcon() {
+  return <svg className="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16.5-.8 4.3 4.3-.8L19 8.5 15.5 5 4 16.5Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /><path d="m13.5 7 3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.8" /></svg>;
+}
+
+function DeleteIcon() {
+  return <svg className="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V4h6v3m-8 0 .8 13h8.4L17 7M10 11v6M14 11v6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+}
+
+function ThemeIcon({ light }: { light: boolean }) {
+  return light
+    ? <svg className="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+    : <svg className="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 }
 
 function BackButton({ onClick, label = 'Zurück' }: { onClick: () => void; label?: string }) {
-  return <button className="back-button" onClick={onClick} type="button"><span aria-hidden="true">←</span> {label}</button>;
+  return <button className="back-button" onClick={onClick} type="button"><BackIcon /><span>{label}</span></button>;
 }
 
 function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
   const isLight = theme === 'light';
-  return <button className="theme-toggle" type="button" onClick={(event) => { event.stopPropagation(); onToggle(); }} aria-label={`Zu ${isLight ? 'Dark' : 'Light'} Mode wechseln`}><span className="theme-toggle-icon" aria-hidden="true">{isLight ? '☾' : '☼'}</span><span>{isLight ? 'Dark' : 'Light'}</span></button>;
+  return <button className="theme-toggle" type="button" onClick={(event) => { event.stopPropagation(); onToggle(); }} aria-label={`Zu ${isLight ? 'Dark' : 'Light'} Mode wechseln`}><span className="theme-toggle-icon"><ThemeIcon light={isLight} /></span><span>{isLight ? 'Dark' : 'Light'}</span></button>;
 }
 
 function usePwaInstall() {
@@ -327,7 +365,7 @@ function InstallGuide({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: (
         ['03', 'Installation bestätigen', 'Bestätige mit „Installieren“ oder „Hinzufügen“. Danach findest du sip. auf deinem Startbildschirm und kannst es wie eine App öffnen.'],
       ];
   return <AppFrame theme={theme} className="install-screen">
-    <header className="install-header"><a className="back-button" href="/" aria-label="Zurück zur Startseite"><span aria-hidden="true">←</span> Zurück</a><Logo light={theme === 'dark'} /><ThemeToggle theme={theme} onToggle={onToggleTheme} /></header>
+    <header className="install-header"><a className="back-button" href="/" aria-label="Zurück zur Startseite"><BackIcon /><span>Zurück</span></a><Logo light={theme === 'dark'} /><ThemeToggle theme={theme} onToggle={onToggleTheme} /></header>
     <div className="install-content">
       <div className="eyebrow dark"><span /> sip. auf deinem Smartphone</div>
       <h1>Einmal einrichten.<br /><em>Immer bereit.</em></h1>
@@ -363,8 +401,8 @@ function SetupScreen({ theme, onToggleTheme, data, players, setPlayers, activeCa
       <div className="eyebrow dark"><span /> Erst die Runde, dann der Rest</div>
       <h2>Wer ist<br /><em>dabei?</em></h2>
       <p className="section-intro">Mindestens zwei Personen. Namen später ändern? Einfach eine neue Runde starten.</p>
-      <section className="setup-section"><div className="section-label"><span>Spieler</span><span className="count-badge">{players.length}</span></div><div className="player-chips">{players.map((player, index) => <div className="player-chip" key={`${player}-${index}`}><span className="avatar" style={{ '--avatar-index': index } as React.CSSProperties}>{player.charAt(0).toUpperCase()}</span><span>{player}</span><button type="button" aria-label={`${player} entfernen`} onClick={() => removePlayer(index)}>×</button></div>)}</div><form className="add-player" onSubmit={(event) => { event.preventDefault(); addPlayer(); }}><input value={name} onChange={(event) => { setName(event.target.value); setError(''); }} placeholder="Name hinzufügen" maxLength={24} aria-label="Spielername" autoComplete="off" inputMode="text" enterKeyHint="done" /><button type="submit" aria-label="Spieler hinzufügen">+</button></form>{error && <p className="field-error">{error}</p>}{players.length < 2 && <p className="field-hint">Noch {2 - players.length} Spieler{2 - players.length === 1 ? '' : 'n'} hinzufügen, dann kann es losgehen.</p>}</section>
-      <section className="setup-section category-section"><div className="section-label"><span>Kategorien</span><span className="category-hint">{cardCount} Karten</span></div><div className="category-list">{data.categories.map((category, index) => <label className={`category-toggle ${activeCategoryIds.includes(category.id) ? 'selected' : ''}`} key={category.id}><input type="checkbox" checked={activeCategoryIds.includes(category.id)} onChange={() => toggleCategory(category.id)} /><span className={`category-marker marker-${colors[index % colors.length]}`} /><span className="category-name">{category.name}</span><span className="checkmark">✓</span></label>)}</div></section>
+      <section className="setup-section"><div className="section-label"><span>Spieler</span><span className="count-badge">{players.length}</span></div><div className="player-chips">{players.map((player, index) => <div className="player-chip" key={`${player}-${index}`}><span className="avatar" style={{ '--avatar-index': index } as React.CSSProperties}>{player.charAt(0).toUpperCase()}</span><span>{player}</span><button type="button" aria-label={`${player} entfernen`} onClick={() => removePlayer(index)}><CloseIcon /></button></div>)}</div><form className="add-player" onSubmit={(event) => { event.preventDefault(); addPlayer(); }}><input value={name} onChange={(event) => { setName(event.target.value); setError(''); }} placeholder="Name hinzufügen" maxLength={24} aria-label="Spielername" autoComplete="off" inputMode="text" enterKeyHint="done" /><button type="submit" aria-label="Spieler hinzufügen"><PlusIcon /></button></form>{error && <p className="field-error">{error}</p>}{players.length < 2 && <p className="field-hint">Noch {2 - players.length} Spieler{2 - players.length === 1 ? '' : 'n'} hinzufügen, dann kann es losgehen.</p>}</section>
+      <section className="setup-section category-section"><div className="section-label"><span>Kategorien</span><span className="category-hint">{cardCount} Karten</span></div><div className="category-list">{data.categories.map((category, index) => <label className={`category-toggle ${activeCategoryIds.includes(category.id) ? 'selected' : ''}`} key={category.id}><input type="checkbox" checked={activeCategoryIds.includes(category.id)} onChange={() => toggleCategory(category.id)} /><span className={`category-marker marker-${colors[index % colors.length]}`} /><span className="category-name">{category.name}</span><span className="checkmark"><CheckIcon /></span></label>)}</div></section>
       <button className="primary-button start-button" type="button" disabled={!canStart} onClick={onStart}>{loading ? 'Karten laden …' : 'Start Game'} <ArrowIcon /></button>
     </div>
   </AppFrame>;
@@ -373,15 +411,71 @@ function SetupScreen({ theme, onToggleTheme, data, players, setPlayers, activeCa
 function GameScreen({ theme, onToggleTheme, deck, players, onFinish, onExit }: { theme: Theme; onToggleTheme: () => void; deck: Card[]; players: string[]; onFinish: () => void; onExit: () => void }) {
   const [index, setIndex] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
+  const [exitDirection, setExitDirection] = useState<'left' | 'right'>('left');
   const [showQuit, setShowQuit] = useState(false);
   const [isClosingQuit, setIsClosingQuit] = useState(false);
   const card = deck[index];
-  const next = () => {
-    if (isExiting || showQuit) return;
-    if (index >= deck.length - 1) { onFinish(); return; }
+  const transitionTimerRef = useRef<number | null>(null);
+  const advancingRef = useRef(false);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const suppressClickUntilRef = useRef(0);
+  const SWIPE_THRESHOLD = 64;
+  const CARD_EXIT_MS = 220;
+
+  const next = (direction: 'left' | 'right' = 'left') => {
+    if (advancingRef.current || showQuit) return;
+    advancingRef.current = true;
+    setExitDirection(direction);
     setIsExiting(true);
-    window.setTimeout(() => { setIndex((value) => value + 1); setIsExiting(false); }, 180);
+    transitionTimerRef.current = window.setTimeout(() => {
+      if (index >= deck.length - 1) {
+        onFinish();
+        return;
+      }
+      setIndex((value) => value + 1);
+      setIsExiting(false);
+      advancingRef.current = false;
+    }, CARD_EXIT_MS);
   };
+
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (advancingRef.current || showQuit || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    const start = touchStartRef.current;
+    if (!start || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    if (Math.abs(deltaX) > 10 && Math.abs(deltaX) > Math.abs(deltaY)) event.preventDefault();
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    const start = touchStartRef.current;
+    touchStartRef.current = null;
+    if (!start || advancingRef.current || showQuit) return;
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    if (Math.abs(deltaX) >= SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY)) {
+      suppressClickUntilRef.current = Date.now() + 500;
+      next(deltaX < 0 ? 'left' : 'right');
+    }
+  };
+
+  const handleTouchCancel = () => {
+    touchStartRef.current = null;
+  };
+
+  const handleGameClick = () => {
+    if (Date.now() < suppressClickUntilRef.current) return;
+    next('left');
+  };
+
   const dismissQuit = () => {
     if (isClosingQuit) return;
     setIsClosingQuit(true);
@@ -392,12 +486,21 @@ function GameScreen({ theme, onToggleTheme, deck, players, onFinish, onExit }: {
     setIsClosingQuit(true);
     window.setTimeout(onExit, 180);
   };
-  useEffect(() => { const handler = (event: KeyboardEvent) => { if (event.key === ' ' || event.key === 'Enter') next(); }; window.addEventListener('keydown', handler); return () => window.removeEventListener('keydown', handler); });
+
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => { if (event.key === ' ' || event.key === 'Enter') next('left'); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [index, deck.length, showQuit, isExiting]);
+  useEffect(() => () => {
+    if (transitionTimerRef.current !== null) window.clearTimeout(transitionTimerRef.current);
+  }, []);
+
   if (!card) return <FinishedScreen theme={theme} onToggleTheme={onToggleTheme} onAgain={() => undefined} onHome={onFinish} />;
   const category = card.category_name || (card.category_id === 1 ? 'Fragen' : card.category_id === 2 ? 'Gruppenaufgaben' : 'Einzelaufgaben');
-  return <AppFrame theme={theme} className="game-screen" onClick={next}>
-    <header className="game-header"><div className="game-header-left"><button className="game-exit" type="button" aria-label="Spiel beenden" onClick={(event) => { event.stopPropagation(); setShowQuit(true); }}><span className="game-exit-arrow" aria-hidden="true">←</span><span>Beenden</span></button></div><Logo light={theme === 'dark'} /><div className="game-header-right"><ThemeToggle theme={theme} onToggle={onToggleTheme} /><span className="round-counter">Card <strong>{index + 1}</strong> / {deck.length}</span><span className="player-count">{players.length} dabei</span></div></header>
-    <div className="game-stage"><div className={`prompt-card card-${index % 3} ${isExiting ? 'is-exiting' : ''}`}><div className="card-topline"><span className="card-category">{category}</span><span className="card-mark">sip.</span></div><FitCardText text={card.text} /><div className="card-bottomline"><span>Tippen für nächste Karte</span><span className="card-arrow">→</span></div></div></div>
+  return <AppFrame theme={theme} className="game-screen" onClick={handleGameClick}>
+    <header className="game-header"><div className="game-header-left"><button className="game-exit" type="button" aria-label="Spiel beenden" onClick={(event) => { event.stopPropagation(); setShowQuit(true); }}><BackIcon /><span>Beenden</span></button></div><Logo light={theme === 'dark'} /><div className="game-header-right"><ThemeToggle theme={theme} onToggle={onToggleTheme} /><span className="round-counter">Card <strong>{index + 1}</strong> / {deck.length}</span><span className="player-count">{players.length} dabei</span></div></header>
+    <div className="game-stage"><div key={`${card.id}-${index}`} className={`prompt-card card-${index % 3} ${isExiting ? `is-exiting is-exiting-${exitDirection}` : ''}`} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd} onTouchCancel={handleTouchCancel}><div className="card-topline"><span className="card-category">{category}</span><span className="card-mark">sip.</span></div><FitCardText text={card.text} /><div className="card-bottomline"><span>Tippen für nächste Karte</span><ArrowIcon /></div></div></div>
     <footer className="game-footer"><span>Eine Runde. Eine Karte.</span><span className="tap-indicator"><i /> tap anywhere</span></footer>
     {showQuit && <div className={`quit-backdrop ${isClosingQuit ? 'is-closing' : ''}`} role="presentation" onClick={dismissQuit}><section className="quit-dialog" role="dialog" aria-modal="true" aria-labelledby="quit-title" onClick={(event) => event.stopPropagation()}><span className="quit-dialog-mark">sip.</span><h2 id="quit-title">Spiel beenden?</h2><p>Die aktuelle Runde wird beendet. Du kannst jederzeit eine neue starten.</p><div className="quit-actions"><button className="text-button" type="button" onClick={dismissQuit}>Weiterspielen</button><button className="primary-button" type="button" onClick={leaveGame}>Beenden <ArrowIcon /></button></div></section></div>}
   </AppFrame>;
@@ -418,7 +521,7 @@ function AdminApp({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () =>
 function AdminLogin({ theme, onToggleTheme, onSuccess }: { theme: Theme; onToggleTheme: () => void; onSuccess: (username: string) => void }) {
   const [username, setUsername] = useState(''); const [password, setPassword] = useState(''); const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
   const login = async (event: React.FormEvent) => { event.preventDefault(); setBusy(true); setError(''); try { const result = await api<{ user: { username: string } }>('/api/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }); onSuccess(result.user.username); } catch (loginError) { setError(loginError instanceof Error ? loginError.message : 'Login fehlgeschlagen.'); } finally { setBusy(false); } };
-  return <AppFrame theme={theme} className="admin-screen"><header className="admin-login-header"><a className="back-button" href="/" aria-label="Zurück zur App"><span aria-hidden="true">←</span> Zurück zur App</a><Logo light={theme === 'dark'} /><ThemeToggle theme={theme} onToggle={onToggleTheme} /></header><div className="admin-grid admin-login-grid"><div className="admin-aside"><div className="admin-aside-copy"><span className="mini-sticker">behind the scenes</span><h1>Mach's<br /><em>zu deinem</em><br />Spiel.</h1><p>Verwalte Karten und Kategorien für deine nächste Runde.</p></div></div><div className="admin-panel"><div className="admin-panel-inner"><div className="eyebrow dark"><span /> Admin-Bereich</div><h2>Willkommen<br /><em>zurück.</em></h2><p className="section-intro">Melde dich an, um dein Karten-Deck zu verwalten.</p><form className="admin-form" onSubmit={login}><label>Benutzername<input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" inputMode="text" enterKeyHint="next" placeholder="admin" /></label><label>Passwort<input value={password} onChange={(event) => setPassword(event.target.value)} type="password" autoComplete="current-password" enterKeyHint="done" placeholder="••••••••" /></label>{error && <p className="field-error">{error}</p>}<button className="primary-button" type="submit" disabled={busy}>{busy ? 'Anmelden …' : 'Anmelden'} <ArrowIcon /></button></form><p className="admin-security">Deine Session ist sicher und läuft nach 8 Stunden ab.</p></div></div></div></AppFrame>;
+  return <AppFrame theme={theme} className="admin-screen"><header className="admin-login-header"><a className="back-button" href="/" aria-label="Zurück zur App"><BackIcon /><span>Zurück zur App</span></a><Logo light={theme === 'dark'} /><ThemeToggle theme={theme} onToggle={onToggleTheme} /></header><div className="admin-grid admin-login-grid"><div className="admin-aside"><div className="admin-aside-copy"><span className="mini-sticker">behind the scenes</span><h1>Mach's<br /><em>zu deinem</em><br />Spiel.</h1><p>Verwalte Karten und Kategorien für deine nächste Runde.</p></div></div><div className="admin-panel"><div className="admin-panel-inner"><div className="eyebrow dark"><span /> Admin-Bereich</div><h2>Willkommen<br /><em>zurück.</em></h2><p className="section-intro">Melde dich an, um dein Karten-Deck zu verwalten.</p><form className="admin-form" onSubmit={login}><label>Benutzername<input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" inputMode="text" enterKeyHint="next" placeholder="admin" /></label><label>Passwort<input value={password} onChange={(event) => setPassword(event.target.value)} type="password" autoComplete="current-password" enterKeyHint="done" placeholder="••••••••" /></label>{error && <p className="field-error">{error}</p>}<button className="primary-button" type="submit" disabled={busy}>{busy ? 'Anmelden …' : 'Anmelden'} <ArrowIcon /></button></form><p className="admin-security">Deine Session ist sicher und läuft nach 8 Stunden ab.</p></div></div></div></AppFrame>;
 }
 
 function CsvImportPanel({ onImport, importing }: { onImport: (event: React.ChangeEvent<HTMLInputElement>) => void; importing: boolean }) {
@@ -551,7 +654,7 @@ function CardEditorDrawer({ open, mode, text, categoryId, categories, duplicateW
     if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); onSubmit(); }
   };
   return <div className="card-editor-backdrop" onClick={onClose}><aside className="card-editor-drawer" role="dialog" aria-modal="true" aria-labelledby="card-editor-title" onClick={(event) => event.stopPropagation()}>
-    <div className="card-editor-header"><div><span className="card-kicker">{mode === 'create' ? 'Neue Karte' : 'Karte bearbeiten'}</span><h2 id="card-editor-title">{mode === 'create' ? <>{'Frage'}<br /><em>bauen.</em></> : <>{'Frage'}<br /><em>schärfen.</em></>}</h2></div><button className="drawer-close" type="button" onClick={onClose} aria-label="Editor schließen">×</button></div>
+    <div className="card-editor-header"><div><span className="card-kicker">{mode === 'create' ? 'Neue Karte' : 'Karte bearbeiten'}</span><h2 id="card-editor-title">{mode === 'create' ? <>{'Frage'}<br /><em>bauen.</em></> : <>{'Frage'}<br /><em>schärfen.</em></>}</h2></div><button className="drawer-close" type="button" onClick={onClose} aria-label="Editor schließen"><CloseIcon /></button></div>
     <form className="card-editor-form" onSubmit={(event) => { event.preventDefault(); onSubmit(); }}>
       <div className="card-editor-scroll">
       <label className="editor-field-label" htmlFor="card-editor-text">Karteninhalt</label>
@@ -561,7 +664,7 @@ function CardEditorDrawer({ open, mode, text, categoryId, categories, duplicateW
       {duplicateWarning && <p className={`duplicate-warning ${duplicateWarning.kind === 'exact' ? 'is-exact' : ''}`} role="alert">{duplicateWarning.kind === 'exact' ? 'Diese Frage gibt es bereits.' : 'Diese Frage klingt sehr ähnlich wie:'}<strong>„{duplicateWarning.card.text}“</strong></p>}
       <label className="editor-field-label" htmlFor="card-editor-category">Kategorie</label>
       <select id="card-editor-category" value={categoryId} onChange={(event) => onCategoryChange(event.target.value)}>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select>
-      <div className="editor-preview"><div className="editor-preview-heading"><span>Live-Vorschau</span><span>wie im Spiel</span></div><div className="editor-preview-card prompt-card card-0"><div className="card-topline"><span>{previewCategory}</span><span className="card-mark">sip.</span></div><FitCardText text={previewText} preview /><div className="card-bottomline"><span>Tippen für nächste Karte</span><span className="card-arrow">→</span></div></div></div>
+      <div className="editor-preview"><div className="editor-preview-heading"><span>Live-Vorschau</span><span>wie im Spiel</span></div><div className="editor-preview-card prompt-card card-0"><div className="card-topline"><span>{previewCategory}</span><span className="card-mark">sip.</span></div><FitCardText text={previewText} preview /><div className="card-bottomline"><span>Tippen für nächste Karte</span><ArrowIcon /></div></div></div>
       </div>
       <div className="card-editor-actions"><button className="text-button" type="button" onClick={onClose}>Abbrechen</button><button className="primary-button" type="submit" disabled={!text.trim() || !categoryId}>{mode === 'create' ? 'Karte anlegen' : 'Änderungen speichern'} <ArrowIcon /></button></div>
     </form>
@@ -578,7 +681,7 @@ function ToastItem({ toast, onDismiss }: { toast: ToastMessage; onDismiss: () =>
     const removeTimer = window.setTimeout(onDismiss, 3600);
     return () => { window.clearTimeout(leaveTimer); window.clearTimeout(removeTimer); };
   }, [toast.id]);
-  return <div className={`toast ${toast.kind === 'error' ? 'is-error' : toast.kind === 'info' ? 'is-info' : ''} ${isLeaving ? 'is-leaving' : ''}`} role={toast.kind === 'error' ? 'alert' : 'status'}><span className="toast-icon" aria-hidden="true">{toast.kind === 'error' ? '!' : toast.kind === 'info' ? 'i' : '✓'}</span><span className="toast-message">{toast.message}</span><button className="toast-dismiss" type="button" onClick={onDismiss} aria-label="Meldung schließen">×</button></div>;
+  return <div className={`toast ${toast.kind === 'error' ? 'is-error' : toast.kind === 'info' ? 'is-info' : ''} ${isLeaving ? 'is-leaving' : ''}`} role={toast.kind === 'error' ? 'alert' : 'status'}><span className="toast-icon" aria-hidden="true">{toast.kind === 'error' ? '!' : toast.kind === 'info' ? 'i' : <CheckIcon />}</span><span className="toast-message">{toast.message}</span><button className="toast-dismiss" type="button" onClick={onDismiss} aria-label="Meldung schließen"><CloseIcon /></button></div>;
 }
 
 function ToastViewport({ toasts, onDismiss }: { toasts: ToastMessage[]; onDismiss: (id: number) => void }) {
@@ -613,7 +716,7 @@ function AdminCardRow({ card, categories, duplicateChecker, onSave, onDelete, on
   useEffect(() => { if (!editing) { setText(card.text); setCategoryId(String(card.category_id)); } }, [card, editing]);
   const save = async () => { if (!text.trim() || !categoryId) return; if (await onSave(card.id, text, Number(categoryId))) setEditing(false); };
   if (editing) return <div className="admin-prompt-row inline-editing"><div className="prompt-category-cell"><span className="prompt-category">Bearbeiten</span><select className="inline-category-select" value={categoryId} onChange={(event) => setCategoryId(event.target.value)} aria-label="Kategorie ändern">{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select></div><div className="prompt-text-cell"><textarea value={text} onChange={(event) => setText(event.target.value)} onKeyDown={(event) => { if (event.key === 'Escape') { event.preventDefault(); setEditing(false); } if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) { event.preventDefault(); void save(); } }} autoFocus maxLength={500} rows={3} aria-label="Karteninhalt bearbeiten" />{duplicateChecker(text, card.id) && <span className="inline-duplicate-warning">Ähnliche Frage vorhanden</span>}</div><div className="row-actions"><button className="row-action primary-action" type="button" onClick={() => void save()}>Speichern</button><button className="row-action" type="button" onClick={() => setEditing(false)}>Abbrechen</button></div></div>;
-  return <div className="admin-prompt-row" onDoubleClick={() => setEditing(true)}><div className="prompt-category-cell"><span className="prompt-category">{card.category_name}</span></div><div className="prompt-text-cell"><p><CardText text={card.text} /></p></div><div className="row-actions"><button className="row-action edit-action" type="button" onClick={() => onEditDrawer(card)}><span className="row-action-icon" aria-hidden="true">✏️</span><span className="row-action-label">Bearbeiten</span></button><button type="button" className="row-delete" onClick={() => onDelete(card)} aria-label="Karte löschen"><span aria-hidden="true">🗑️</span><span className="row-delete-label">Löschen</span></button></div></div>;
+  return <div className="admin-prompt-row" onDoubleClick={() => setEditing(true)}><div className="prompt-category-cell"><span className="prompt-category">{card.category_name}</span></div><div className="prompt-text-cell"><p><CardText text={card.text} /></p></div><div className="row-actions"><button className="row-action edit-action" type="button" onClick={() => onEditDrawer(card)}><EditIcon /><span className="row-action-label">Bearbeiten</span></button><button type="button" className="row-delete" onClick={() => onDelete(card)} aria-label="Karte löschen"><DeleteIcon /><span className="row-delete-label">Löschen</span></button></div></div>;
 }
 
 function CategoryManagerRow({ category, index, total, cardCount, onRename, onMove, onDelete }: { category: Category; index: number; total: number; cardCount: number; onRename: (id: number, name: string) => Promise<boolean>; onMove: (id: number, direction: 'up' | 'down') => void; onDelete: (category: Category) => void }) {
@@ -621,8 +724,8 @@ function CategoryManagerRow({ category, index, total, cardCount, onRename, onMov
   const [name, setName] = useState(category.name);
   useEffect(() => { if (!editing) setName(category.name); }, [category.name, editing]);
   const save = async (event: React.FormEvent) => { event.preventDefault(); if (name.trim() && await onRename(category.id, name)) setEditing(false); };
-  if (editing) return <form className="admin-category-row category-editing" onSubmit={save}><span className="category-marker marker-lime" /><input value={name} onChange={(event) => setName(event.target.value)} onKeyDown={(event) => { if (event.key === 'Escape') { event.preventDefault(); setEditing(false); } }} autoFocus maxLength={60} autoComplete="off" inputMode="text" enterKeyHint="done" aria-label="Kategorie umbenennen" /><button className="row-action primary-action" type="submit">Speichern</button><button className="row-action" type="button" onClick={() => setEditing(false)} aria-label="Umbenennen abbrechen">×</button></form>;
-  return <div className="admin-category-row"><span className={`category-marker marker-${colors[index % colors.length]}`} /><button className="category-title" type="button" onDoubleClick={() => setEditing(true)} onClick={() => setEditing(true)}>{category.name}</button><span className="category-card-count">{cardCount} Karten</span><div className="category-order-actions"><button type="button" disabled={index === 0} onClick={() => onMove(category.id, 'up')} aria-label={`${category.name} nach oben`}>↑</button><button type="button" disabled={index === total - 1} onClick={() => onMove(category.id, 'down')} aria-label={`${category.name} nach unten`}>↓</button></div><button type="button" className="row-delete" onClick={() => onDelete(category)} aria-label={`${category.name} löschen`}>×</button></div>;
+  if (editing) return <form className="admin-category-row category-editing" onSubmit={save}><span className="category-marker marker-lime" /><input value={name} onChange={(event) => setName(event.target.value)} onKeyDown={(event) => { if (event.key === 'Escape') { event.preventDefault(); setEditing(false); } }} autoFocus maxLength={60} autoComplete="off" inputMode="text" enterKeyHint="done" aria-label="Kategorie umbenennen" /><button className="row-action primary-action" type="submit">Speichern</button><button className="row-action" type="button" onClick={() => setEditing(false)} aria-label="Umbenennen abbrechen"><CloseIcon /></button></form>;
+  return <div className="admin-category-row"><span className={`category-marker marker-${colors[index % colors.length]}`} /><button className="category-title" type="button" onDoubleClick={() => setEditing(true)} onClick={() => setEditing(true)}>{category.name}</button><span className="category-card-count">{cardCount} Karten</span><div className="category-order-actions"><button type="button" disabled={index === 0} onClick={() => onMove(category.id, 'up')} aria-label={`${category.name} nach oben`}><ChevronIcon direction="up" /></button><button type="button" disabled={index === total - 1} onClick={() => onMove(category.id, 'down')} aria-label={`${category.name} nach unten`}><ChevronIcon direction="down" /></button></div><button type="button" className="row-delete" onClick={() => onDelete(category)} aria-label={`${category.name} löschen`}><CloseIcon /></button></div>;
 }
 
 function AdminDashboardEnhanced({ theme, onToggleTheme, username, onLogout }: { theme: Theme; onToggleTheme: () => void; username: string; onLogout: () => void }) {
@@ -707,8 +810,8 @@ function AdminDashboardEnhanced({ theme, onToggleTheme, username, onLogout }: { 
     <div className="dashboard-content"><div className="dashboard-intro"><div><div className="eyebrow dark"><span /> Dein Backstage</div><h1>Deck<br /><em>Studio.</em></h1></div><div className="dashboard-stats"><div><strong>{categories.length}</strong><span>Kategorien</span></div><div><strong>{cards.length}</strong><span>Karten</span></div></div></div>
       <nav className="dashboard-tabs" aria-label="Adminbereiche"><button type="button" className={activeTab === 'deck' ? 'active' : ''} onClick={() => setActiveTab('deck')}>Deck verwalten <span>{cards.length}</span></button><button type="button" className={activeTab === 'import' ? 'active' : ''} onClick={() => setActiveTab('import')}>CSV importieren</button></nav>
       {activeTab === 'import' ? <CsvImportPanel onImport={importCsv} importing={importing} /> : <>
-        <div className="admin-columns"><section className="admin-card manage-categories"><div className="admin-card-heading"><div><span className="card-kicker">Kategorien</span><h2>Ordnung<br /><em>schaffen.</em></h2></div><span className="heading-icon">✳</span></div><form className="inline-form" onSubmit={addCategory}><input value={categoryName} onChange={(event) => setCategoryName(event.target.value)} maxLength={60} placeholder="Neue Kategorie" autoComplete="off" inputMode="text" enterKeyHint="done" /><button type="submit" aria-label="Kategorie hinzufügen">+</button></form><div className="admin-category-list">{categories.map((category, index) => <CategoryManagerRow key={category.id} category={category} index={index} total={categories.length} cardCount={cards.filter((card) => card.category_id === category.id).length} onRename={renameCategory} onMove={moveCategory} onDelete={requestDeleteCategory} />)}</div></section>
-          <section className="admin-card manage-cards"><div className="admin-card-heading"><div><span className="card-kicker">Karten</span><h2>Die guten<br /><em>Fragen.</em></h2></div><button className="desktop-create-button" type="button" onClick={openCreate}><span aria-hidden="true">+</span><span>Frage erstellen</span></button></div><div className="card-filter"><button type="button" className={filter === 'all' ? 'active' : ''} onClick={() => changeFilter('all')}>Alle <span className="filter-count">{cards.length}</span></button>{categories.map((category) => <button type="button" className={filter === String(category.id) ? 'active' : ''} onClick={() => changeFilter(String(category.id))} key={category.id}>{category.name} <span className="filter-count">{cards.filter((card) => card.category_id === category.id).length}</span></button>)}</div><div className="card-list-tools"><label className="card-search"><span aria-hidden="true">⌕</span><input ref={searchRef} type="search" value={searchQuery} onChange={(event) => changeSearch(event.target.value)} placeholder="Fragen durchsuchen …" aria-label="Fragen durchsuchen" autoComplete="off" inputMode="search" enterKeyHint="search" /><span className="shortcut-hint"><kbd>⌘</kbd><kbd>K</kbd></span></label><span className="result-count">{filteredCards.length} Treffer</span></div><div className="admin-list-header"><span>Kategorie</span><span>Frage</span><span>Aktionen</span></div><div className="admin-card-list">{visibleCards.map((card) => <AdminCardRow key={card.id} card={card} categories={categories} duplicateChecker={duplicateChecker} onSave={saveInlineCard} onDelete={requestDeleteCard} onEditDrawer={openEdit} />)}{!visibleCards.length && <p className="empty-state">Keine Karten für diese Suche.</p>}</div>{filteredCards.length > 0 && <nav className="pagination" aria-label="Karten-Seiten"><button type="button" disabled={page === 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>← Zurück</button><span>Seite {page} von {pageCount}</span><button type="button" disabled={page === pageCount} onClick={() => setPage((current) => Math.min(pageCount, current + 1))}>Weiter →</button></nav>}</section></div>
+        <div className="admin-columns"><section className="admin-card manage-categories"><div className="admin-card-heading"><div><span className="card-kicker">Kategorien</span><h2>Ordnung<br /><em>schaffen.</em></h2></div><span className="heading-icon" aria-hidden="true">✳</span></div><form className="inline-form" onSubmit={addCategory}><input value={categoryName} onChange={(event) => setCategoryName(event.target.value)} maxLength={60} placeholder="Neue Kategorie" autoComplete="off" inputMode="text" enterKeyHint="done" /><button type="submit" aria-label="Kategorie hinzufügen"><PlusIcon /></button></form><div className="admin-category-list">{categories.map((category, index) => <CategoryManagerRow key={category.id} category={category} index={index} total={categories.length} cardCount={cards.filter((card) => card.category_id === category.id).length} onRename={renameCategory} onMove={moveCategory} onDelete={requestDeleteCategory} />)}</div></section>
+          <section className="admin-card manage-cards"><div className="admin-card-heading"><div><span className="card-kicker">Karten</span><h2>Die guten<br /><em>Fragen.</em></h2></div><button className="desktop-create-button" type="button" onClick={openCreate}><PlusIcon /><span>Frage erstellen</span></button></div><div className="card-filter"><button type="button" className={filter === 'all' ? 'active' : ''} onClick={() => changeFilter('all')}>Alle <span className="filter-count">{cards.length}</span></button>{categories.map((category) => <button type="button" className={filter === String(category.id) ? 'active' : ''} onClick={() => changeFilter(String(category.id))} key={category.id}>{category.name} <span className="filter-count">{cards.filter((card) => card.category_id === category.id).length}</span></button>)}</div><div className="card-list-tools"><label className="card-search"><SearchIcon /><input ref={searchRef} type="search" value={searchQuery} onChange={(event) => changeSearch(event.target.value)} placeholder="Fragen durchsuchen …" aria-label="Fragen durchsuchen" autoComplete="off" inputMode="search" enterKeyHint="search" /><span className="shortcut-hint"><kbd>⌘</kbd><kbd>K</kbd></span></label><span className="result-count">{filteredCards.length} Treffer</span></div><div className="admin-list-header"><span>Kategorie</span><span>Frage</span><span>Aktionen</span></div><div className="admin-card-list">{visibleCards.map((card) => <AdminCardRow key={card.id} card={card} categories={categories} duplicateChecker={duplicateChecker} onSave={saveInlineCard} onDelete={requestDeleteCard} onEditDrawer={openEdit} />)}{!visibleCards.length && <p className="empty-state">Keine Karten für diese Suche.</p>}</div>{filteredCards.length > 0 && <nav className="pagination" aria-label="Karten-Seiten"><button type="button" disabled={page === 1} onClick={() => setPage((current) => Math.max(1, current - 1))}><BackIcon /><span>Zurück</span></button><span>Seite {page} von {pageCount}</span><button type="button" disabled={page === pageCount} onClick={() => setPage((current) => Math.min(pageCount, current + 1))}><span>Weiter</span><ArrowIcon /></button></nav>}</section></div>
       </>}
     </div>
     <ToastViewport toasts={toasts} onDismiss={dismissToast} />

@@ -104,7 +104,7 @@ h1 em, h2 em { color: var(--color-secondary); font-style: normal; }
 .screen-header { padding: max(1.5rem, env(safe-area-inset-top)) 1.25rem 0; }
 .step-count, .round-counter, .category-hint, .count-badge, .card-kicker, .prompt-category { color: var(--color-text-subtle); font: .65rem 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
 .back-button { padding: .4rem 0; border: 0; background: transparent; color: var(--color-text-muted); font-size: .82rem; }
-.back-button span { margin-right: .2rem; font-size: 1.15rem; }
+.back-button > .ui-icon { margin-right: .1rem; }
 .setup-content { width: min(100%, 31rem); margin: 0 auto; padding: 3.1rem 1.25rem max(2rem, env(safe-area-inset-bottom)); }
 .setup-content h2, .admin-panel h2 { margin: 1.1rem 0 .9rem; font-size: clamp(3.1rem, 14vw, 5rem); }
 .section-intro { max-width: 22rem; color: var(--color-text-muted); font-size: .9rem; line-height: 1.5; }
@@ -138,7 +138,7 @@ h1 em, h2 em { color: var(--color-secondary); font-style: normal; }
 
 .game-screen { display: flex; flex-direction: column; position: relative; padding: max(1.5rem, env(safe-area-inset-top)) 1.1rem max(1.1rem, env(safe-area-inset-bottom)); cursor: pointer; user-select: none; background: transparent; }.game-screen::before { content: none; }.game-header, .game-footer { position: relative; z-index: 1; }.game-header { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: .75rem; padding: 0 .2rem; }.game-header-left { min-width: 0; justify-self: start; }.game-header > .logo { justify-self: center; font-size: 1.75rem; }.game-header-right { display: flex; align-items: center; justify-self: end; min-width: 0; gap: .9rem; }.round-counter { color: var(--color-text-muted); letter-spacing: 0; text-transform: none; }.round-counter strong { color: var(--color-primary); font-weight: 500; }.player-count { color: var(--color-text-subtle); font: .63rem 'DM Mono', monospace; }
 .game-exit { display: inline-flex; align-items: center; gap: .35rem; min-height: 2.45rem; padding: .45rem .75rem .45rem .62rem; border: 1px solid var(--color-border); border-radius: 99px; background: var(--color-surface-soft); color: var(--color-text-muted); font: .62rem 'DM Mono', monospace; letter-spacing: .04em; line-height: 1; touch-action: manipulation; transition: color .2s, border-color .2s, background .2s, transform .2s; }.game-exit-arrow { font-size: 1rem; line-height: .8; }.game-exit:hover, .game-exit:focus-visible { border-color: var(--color-border-strong); background: color-mix(in srgb, var(--color-text) 10%, transparent); color: var(--color-text); transform: translateX(-1px); }
-.game-stage { display: grid; flex: 1; place-items: center; padding: 2rem .25rem; perspective: 900px; }.prompt-card { display: flex; flex-direction: column; justify-content: space-between; width: min(100%, 25rem); min-height: min(70dvh, 36rem); padding: 1.25rem; border-radius: 1.25rem; background: var(--color-primary); color: var(--color-primary-contrast); box-shadow: 0 2rem 5rem var(--color-shadow); transform: rotate(-2deg); transition: transform .18s, opacity .18s; }.prompt-card.card-1 { background: var(--color-secondary); }.prompt-card.card-2 { background: var(--color-info); }.prompt-card:hover { transform: rotate(0) scale(1.01); }.prompt-card.is-exiting { opacity: 0; transform: translateX(-3rem) rotate(-12deg); }.card-topline, .card-bottomline { display: flex; align-items: center; justify-content: space-between; font: .62rem 'DM Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }.card-mark { font: 700 1rem 'Space Grotesk', sans-serif; letter-spacing: -.1em; }.card-copy { max-width: 16rem; font: 600 clamp(1.7rem, 8vw, 3rem)/1.05 'Space Grotesk', sans-serif; letter-spacing: -.065em; }.card-bottomline { opacity: .55; letter-spacing: 0; text-transform: none; }.card-arrow { font-size: 1.3rem; }.game-footer { display: flex; align-items: center; justify-content: space-between; color: var(--color-text-faint); font: .58rem 'DM Mono', monospace; }.tap-indicator { display: flex; align-items: center; gap: .4rem; color: var(--color-primary); letter-spacing: .08em; text-transform: uppercase; }.tap-indicator i { width: .4rem; height: .4rem; border-radius: 50%; background: var(--color-primary); animation: pulse 1.5s infinite; }
+.game-stage { display: grid; flex: 1; place-items: center; padding: 2rem .25rem; }.prompt-card { display: flex; flex-direction: column; justify-content: space-between; width: min(100%, 25rem); min-height: min(70dvh, 36rem); padding: 1.25rem; border-radius: 1.25rem; background: var(--color-primary); color: var(--color-primary-contrast); box-shadow: 0 2rem 5rem var(--color-shadow); transform: none; transition: transform .2s ease, opacity .22s ease; }.prompt-card.card-1 { background: var(--color-secondary); }.prompt-card.card-2 { background: var(--color-info); }.prompt-card.is-exiting { opacity: 0; }.prompt-card.is-exiting-left { transform: translateX(-115%); }.prompt-card.is-exiting-right { transform: translateX(115%); }.card-topline, .card-bottomline { display: flex; align-items: center; justify-content: space-between; font: .62rem 'DM Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }.card-mark { font: 700 1rem 'Space Grotesk', sans-serif; letter-spacing: -.1em; }.card-copy { max-width: 16rem; font: 600 clamp(1.7rem, 8vw, 3rem)/1.05 'Space Grotesk', sans-serif; letter-spacing: -.065em; }.card-bottomline { opacity: .55; letter-spacing: 0; text-transform: none; }.card-arrow { font-size: 1.3rem; }.game-footer { display: flex; align-items: center; justify-content: space-between; color: var(--color-text-faint); font: .58rem 'DM Mono', monospace; }.tap-indicator { display: flex; align-items: center; gap: .4rem; color: var(--color-primary); letter-spacing: .08em; text-transform: uppercase; }.tap-indicator i { width: .4rem; height: .4rem; border-radius: 50%; background: var(--color-primary); animation: pulse 1.5s infinite; }
 @keyframes pulse { 50% { opacity: .35; transform: scale(.7); } }
 
 .quit-backdrop { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 1.25rem; background: var(--color-overlay); backdrop-filter: blur(8px); }.quit-dialog { width: min(100%, 22rem); padding: 1.5rem; border: 1px solid var(--color-border); border-radius: 1.25rem; background: var(--color-surface-raised); color: var(--color-text); box-shadow: 0 1.5rem 4rem var(--color-shadow); }.quit-dialog-mark { display: inline-block; color: var(--color-secondary); font: 700 1.5rem 'Space Grotesk', sans-serif; letter-spacing: -.1em; }.quit-dialog h2 { margin: 1rem 0 .7rem; font-size: 2.25rem; }.quit-dialog p { color: var(--color-text-muted); font-size: .82rem; line-height: 1.5; }.quit-actions { display: flex; align-items: center; justify-content: flex-end; gap: .7rem; margin-top: 1.5rem; }.quit-actions .text-button { padding-inline: .4rem; color: var(--color-text-muted); }.quit-actions .primary-button { min-height: 2.9rem; }
@@ -468,4 +468,71 @@ button:active:not(:disabled), a:active { transform: scale(.97); }
 
 @media (min-width: 701px) {
   .prompt-card { height: min(67dvh, 40rem); max-height: min(67dvh, 40rem); }
+}
+
+/* Straight, touch-friendly game cards with a desktop-only hover affordance. */
+.prompt-card {
+  touch-action: pan-y;
+  will-change: transform, opacity;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .prompt-card:not(.is-exiting):hover,
+  .prompt-card:not(.is-exiting):focus-visible {
+    transform: scale(1.025);
+  }
+}
+
+@keyframes game-card-enter {
+  from { opacity: 0; transform: translateY(.6rem) scale(.985); }
+  to { opacity: 1; transform: none; }
+}
+
+.prompt-card:not(.is-exiting) {
+  animation: game-card-enter .22s ease-out both;
+}
+
+/* Keep every icon on the same flex center line, independent of font metrics. */
+.ui-icon {
+  display: block;
+  flex: 0 0 auto;
+  width: 1em;
+  height: 1em;
+  line-height: 0;
+}
+
+.back-button,
+.theme-toggle,
+.game-exit,
+.primary-button,
+.small-submit,
+.placeholder-tools button,
+.row-action,
+.danger-button,
+.text-button,
+.desktop-create-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+}
+.pagination button { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; line-height: 1; }
+
+.back-button .ui-icon { width: 1rem; height: 1rem; }
+.theme-toggle-icon { display: inline-flex; align-items: center; justify-content: center; line-height: 0; }
+.theme-toggle-icon .ui-icon { width: 1rem; height: 1rem; }
+.game-exit .ui-icon { width: .95rem; height: .95rem; }
+.primary-button .ui-icon, .small-submit .ui-icon { width: 1.05rem; height: 1.05rem; }
+.player-chip button, .add-player button, .inline-form button, .row-delete, .drawer-close, .category-order-actions button { display: inline-flex; align-items: center; justify-content: center; line-height: 0; }
+.player-chip button .ui-icon, .add-player button .ui-icon, .inline-form button .ui-icon, .row-delete .ui-icon, .drawer-close .ui-icon, .category-order-actions button .ui-icon { width: 1rem; height: 1rem; }
+.checkmark { display: inline-flex; align-items: center; justify-content: center; line-height: 0; }
+.checkmark .ui-icon { width: .9rem; height: .9rem; }
+.card-bottomline .ui-icon { width: 1.15rem; height: 1.15rem; }
+.card-search > .ui-icon { width: 1.05rem; height: 1.05rem; flex: 0 0 auto; }
+.toast-icon { display: inline-flex; align-items: center; justify-content: center; line-height: 0; }
+.toast-icon .ui-icon { width: .85rem; height: .85rem; }
+.toast-dismiss .ui-icon { width: 1rem; height: 1rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .prompt-card { transition-duration: .01ms; animation-duration: .01ms; }
 }
