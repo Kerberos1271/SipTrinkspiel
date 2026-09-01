@@ -208,7 +208,7 @@ function HomeScreen({ theme, onToggleTheme, onPlay, pwaInstall }: { theme: Theme
       <h1>Gute Leute.<br /><em>Gute Ausreden.</em><br />Ein Drink.</h1>
       <p className="hero-copy">Das Karten-Partyspiel, bei dem jede Runde ein bisschen anders läuft.</p>
       <button className="play-button" type="button" onClick={onPlay}><span>Play</span><span className="play-arrow"><ArrowIcon /></span></button>
-      {pwaInstall.isInstallButtonVisible && <button className="install-link" type="button" onClick={() => void handleInstall()} disabled={pwaInstall.isPrompting}><span>Installiere sip. auf deinem Smartphone</span><ArrowIcon /></button>}
+      {pwaInstall.isInstallButtonVisible && <button className="install-link" type="button" onClick={() => void handleInstall()} disabled={pwaInstall.isPrompting}><span>Offline? Installiere sip. auf deinem Smartphone</span><ArrowIcon /></button>}
     </section>
     <footer className="home-footer"><span>Kein Login. Kein Score.</span><a href="/admin">Admin Login <ArrowIcon /></a></footer>
   </AppFrame>;
