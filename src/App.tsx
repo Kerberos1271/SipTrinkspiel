@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { normalizePlaceholders, replacePlayerPlaceholders, sanitizeQuestion } from './placeholders';
+import { normalizePlaceholders, PlayerDrawPool, replacePlayerPlaceholders, resetPlayerPool, sanitizeQuestion } from './placeholders';
+import { useFitText } from './useFitText';
 
 type Category = { id: number; name: string };
 type Card = { id: number; text: string; category_id: number; category_name?: string };
@@ -154,6 +155,8 @@ function PlayerApp({ theme, onToggleTheme, pwaInstall }: { theme: Theme; onToggl
   const [activeCategoryIds, setActiveCategoryIds] = useState<number[]>(fallbackData.categories.map((category) => category.id));
   const [deck, setDeck] = useState<Card[]>([]);
   const [loadState, setLoadState] = useState<'loading' | 'ready'>('loading');
+  const playerPoolRef = useRef<PlayerDrawPool | null>(null);
+  if (!playerPoolRef.current) playerPoolRef.current = new PlayerDrawPool(players);
 
   useEffect(() => {
     api<GameData>('/api/game').then((remote) => {
@@ -164,13 +167,20 @@ function PlayerApp({ theme, onToggleTheme, pwaInstall }: { theme: Theme; onToggl
     }).catch(() => undefined).finally(() => setLoadState('ready'));
   }, []);
 
+  useEffect(() => {
+    if (playerPoolRef.current) resetPlayerPool(playerPoolRef.current, players);
+  }, [players]);
+
   const startGame = () => {
+    const playerPool = playerPoolRef.current || new PlayerDrawPool(players);
+    resetPlayerPool(playerPool, players);
+    playerPoolRef.current = playerPool;
     const shuffled = [...data.cards].filter((card) => activeCategoryIds.includes(card.category_id));
     for (let index = shuffled.length - 1; index > 0; index -= 1) {
       const swapIndex = Math.floor(Math.random() * (index + 1));
       [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
     }
-    setDeck(shuffled.map((card) => ({ ...card, text: replacePlayerPlaceholders(card.text, players) })));
+    setDeck(shuffled.map((card) => ({ ...card, text: replacePlayerPlaceholders(card.text, players, playerPool) })));
     setScreen('game');
   };
 
@@ -288,7 +298,7 @@ function GameScreen({ theme, onToggleTheme, deck, players, onFinish, onExit }: {
   const category = card.category_name || (card.category_id === 1 ? 'Fragen' : card.category_id === 2 ? 'Gruppenaufgaben' : 'Einzelaufgaben');
   return <AppFrame theme={theme} className="game-screen" onClick={next}>
     <header className="game-header"><div className="game-header-left"><button className="game-exit" type="button" aria-label="Spiel beenden" onClick={(event) => { event.stopPropagation(); setShowQuit(true); }}><span className="game-exit-arrow" aria-hidden="true">←</span><span>Beenden</span></button></div><Logo light={theme === 'dark'} /><div className="game-header-right"><ThemeToggle theme={theme} onToggle={onToggleTheme} /><span className="round-counter">Card <strong>{index + 1}</strong> / {deck.length}</span><span className="player-count">{players.length} dabei</span></div></header>
-    <div className="game-stage"><div className={`prompt-card card-${index % 3} ${isExiting ? 'is-exiting' : ''}`}><div className="card-topline"><span className="card-category">{category}</span><span className="card-mark">sip.</span></div><div className="card-copy">{card.text}</div><div className="card-bottomline"><span>Tippen für nächste Karte</span><span className="card-arrow">→</span></div></div></div>
+    <div className="game-stage"><div className={`prompt-card card-${index % 3} ${isExiting ? 'is-exiting' : ''}`}><div className="card-topline"><span className="card-category">{category}</span><span className="card-mark">sip.</span></div><FitCardText text={card.text} /><div className="card-bottomline"><span>Tippen für nächste Karte</span><span className="card-arrow">→</span></div></div></div>
     <footer className="game-footer"><span>Eine Runde. Eine Karte.</span><span className="tap-indicator"><i /> tap anywhere</span></footer>
     {showQuit && <div className={`quit-backdrop ${isClosingQuit ? 'is-closing' : ''}`} role="presentation" onClick={dismissQuit}><section className="quit-dialog" role="dialog" aria-modal="true" aria-labelledby="quit-title" onClick={(event) => event.stopPropagation()}><span className="quit-dialog-mark">sip.</span><h2 id="quit-title">Spiel beenden?</h2><p>Die aktuelle Runde wird beendet. Du kannst jederzeit eine neue starten.</p><div className="quit-actions"><button className="text-button" type="button" onClick={dismissQuit}>Weiterspielen</button><button className="primary-button" type="button" onClick={leaveGame}>Beenden <ArrowIcon /></button></div></section></div>}
   </AppFrame>;
@@ -388,6 +398,14 @@ function CardText({ text }: { text: string }) {
   return <>{parts.map((part, index) => part.match(/^#player\d*$|^\$\{player\d*\}$/) ? <span className="placeholder-token" key={`${part}-${index}`}>{part}</span> : <span key={`${part}-${index}`}>{part}</span>)}</>;
 }
 
+function FitCardText({ text, preview = false }: { text: string; preview?: boolean }) {
+  const { ref, fontSize, isReady } = useFitText<HTMLDivElement>(text, {
+    maxFontSize: preview ? 26 : 32,
+    minFontSize: 12,
+  });
+  return <div ref={ref} className="card-copy" lang="de" style={{ fontSize: `${fontSize}px`, visibility: isReady ? 'visible' : 'hidden' }}>{text}</div>;
+}
+
 function normalizeCardText(value: string) {
   return normalizePlaceholders(value).toLocaleLowerCase().replace(/#player\d*/g, 'player').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
 }
@@ -444,7 +462,7 @@ function CardEditorDrawer({ open, mode, text, categoryId, categories, duplicateW
       {duplicateWarning && <p className={`duplicate-warning ${duplicateWarning.kind === 'exact' ? 'is-exact' : ''}`} role="alert">{duplicateWarning.kind === 'exact' ? 'Diese Frage gibt es bereits.' : 'Diese Frage klingt sehr ähnlich wie:'}<strong>„{duplicateWarning.card.text}“</strong></p>}
       <label className="editor-field-label" htmlFor="card-editor-category">Kategorie</label>
       <select id="card-editor-category" value={categoryId} onChange={(event) => onCategoryChange(event.target.value)}>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select>
-      <div className="editor-preview"><div className="editor-preview-heading"><span>Live-Vorschau</span><span>wie im Spiel</span></div><div className="editor-preview-card prompt-card card-0"><div className="card-topline"><span>{previewCategory}</span><span className="card-mark">sip.</span></div><div className="card-copy">{previewText}</div><div className="card-bottomline"><span>Tippen für nächste Karte</span><span className="card-arrow">→</span></div></div></div>
+      <div className="editor-preview"><div className="editor-preview-heading"><span>Live-Vorschau</span><span>wie im Spiel</span></div><div className="editor-preview-card prompt-card card-0"><div className="card-topline"><span>{previewCategory}</span><span className="card-mark">sip.</span></div><FitCardText text={previewText} preview /><div className="card-bottomline"><span>Tippen für nächste Karte</span><span className="card-arrow">→</span></div></div></div>
       </div>
       <div className="card-editor-actions"><button className="text-button" type="button" onClick={onClose}>Abbrechen</button><button className="primary-button" type="submit" disabled={!text.trim() || !categoryId}>{mode === 'create' ? 'Karte anlegen' : 'Änderungen speichern'} <ArrowIcon /></button></div>
     </form>
