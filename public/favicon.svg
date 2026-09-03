@@ -1,7 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="128" fill="#2d2942"/>
-  <path d="M124 126h264l-18 199c-4 43-40 75-83 75h-62c-43 0-79-32-83-75l-18-199Z" fill="#e3c68c"/>
-  <path d="M137 157h238M178 112c26 20 48 20 74 0 26-20 48-20 74 0" fill="none" stroke="#c86f5b" stroke-width="22" stroke-linecap="round"/>
-  <circle cx="239" cy="229" r="14" fill="#2d2942"/><circle cx="302" cy="229" r="14" fill="#2d2942"/>
-  <path d="M226 278c18 18 53 18 71 0" fill="none" stroke="#2d2942" stroke-width="13" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">sip. App Icon</title>
+  <rect width="512" height="512" rx="132" fill="#09090b"/>
+  <rect x="28" y="28" width="456" height="456" rx="112" fill="#18181b" stroke="#2d2d32" stroke-width="2"/>
+  <path d="M124 160h264l-20 184c-4 41-39 72-80 72h-64c-41 0-76-31-80-72l-20-184Z" fill="#f4f4f5"/>
+  <path d="M139 202h234" fill="none" stroke="#f59e0b" stroke-width="22" stroke-linecap="round"/>
+  <path d="m302 116 50 82" fill="none" stroke="#f59e0b" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="225" cy="276" r="14" fill="#09090b"/>
+  <circle cx="294" cy="276" r="14" fill="#09090b"/>
+  <path d="M211 325c22 20 53 20 75 0" fill="none" stroke="#09090b" stroke-width="13" stroke-linecap="round"/>
 </svg>
