@@ -40,7 +40,7 @@
 :root[data-theme='light'] {
   color-scheme: light;
   /* Clean slate palette: porcelain canvas, white surfaces, and high contrast text. */
-  --bg-app: #f8fafc;
+  --bg-app: #f4f4f6;
   --bg-app-image: none;
   --bg-deep: #f1f5f9;
   --bg-surface: #ffffff;
@@ -681,4 +681,61 @@ button:active:not(:disabled), a:active { transform: scale(.97); }
 .danger-button {
   border: 1px solid transparent;
   color: var(--on-danger);
+}
+
+:root[data-theme='light'] .setup-screen .player-chip {
+  border: 1px solid var(--border-strong);
+  background: #ffffff;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+:root[data-theme='light'] .setup-screen .player-chip button {
+  color: var(--text-muted);
+}
+
+:root[data-theme='light'] .setup-screen .player-chip button:hover,
+:root[data-theme='light'] .setup-screen .player-chip button:focus-visible {
+  color: var(--text-primary);
+}
+
+:root[data-theme='light'] .setup-screen .add-player {
+  border-bottom: 1.5px solid var(--border-strong);
+}
+
+:root[data-theme='light'] .setup-screen .add-player:focus-within {
+  border-bottom-color: var(--text-primary);
+}
+
+:root[data-theme='light'] .setup-screen .add-player input::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+:root[data-theme='light'] .setup-screen .add-player button {
+  color: var(--accent-secondary);
+}
+
+:root[data-theme='light'] .setup-screen .category-list,
+:root[data-theme='light'] .setup-screen .category-toggle {
+  border-color: var(--border-subtle);
+}
+
+:root[data-theme='light'] .setup-screen .category-toggle.selected .category-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+:root[data-theme='light'] .setup-screen .category-toggle.selected .checkmark {
+  color: var(--text-primary);
+}
+
+:root[data-theme='light'] .setup-screen .category-toggle:not(.selected) .checkmark {
+  color: var(--text-muted);
+}
+
+:root[data-theme='light'] .setup-screen .count-badge {
+  border: 1px solid var(--border-strong);
+  background: rgba(0, 0, 0, .05);
+  color: var(--text-primary);
 }

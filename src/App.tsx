@@ -9,7 +9,7 @@ type Screen = 'home' | 'setup' | 'game' | 'finished';
 type Theme = 'dark' | 'light';
 
 const THEME_COLORS: Record<Theme, string> = {
-  light: '#f8fafc',
+  light: '#f4f4f6',
   dark: '#09090b',
 };
 
