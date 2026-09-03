@@ -121,8 +121,8 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
   }
 }
 
-function Logo({ light = false }: { light?: boolean }) {
-  return <span className={`logo ${light ? 'logo-light' : ''}`}>sip<span>.</span></span>;
+function Logo() {
+  return <span className="logo">sip<span>.</span></span>;
 }
 
 function ArrowIcon() {
@@ -250,7 +250,7 @@ function App() {
     window.localStorage.setItem('sip-theme', theme);
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#fbf1e5' : '#09090b');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#f8fafc' : '#09090b');
   }, [theme]);
   const toggleTheme = () => setTheme((current) => current === 'light' ? 'dark' : 'light');
   if (window.location.pathname.startsWith('/admin')) return <AdminApp theme={theme} onToggleTheme={toggleTheme} />;
@@ -339,18 +339,17 @@ type AppFrameProps = {
 };
 
 function AppFrame({ children, className = '', theme = 'dark', onClick, onPointerDown, onPointerMove, onPointerUp, onPointerCancel }: AppFrameProps) {
-  return <main className={`app-frame theme-${theme} ${className}`} onClick={onClick} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerCancel}>{children}</main>;
+  return <main className={`app-frame ${className}`} onClick={onClick} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerCancel}>{children}</main>;
 }
 
 function HomeScreen({ theme, onToggleTheme, onPlay, pwaInstall }: { theme: Theme; onToggleTheme: () => void; onPlay: () => void; pwaInstall: ReturnType<typeof usePwaInstall> }) {
-  const isLight = theme === 'light';
   const handleInstall = async () => {
     const outcome = await pwaInstall.promptInstall();
     if (outcome === 'unavailable') window.location.assign('/install');
   };
   return <AppFrame theme={theme} className="home-screen">
     <div className="ambient-orb orb-one" /><div className="ambient-orb orb-two" />
-    <header className="home-header"><Logo light={!isLight} /><div className="home-tools"><ThemeToggle theme={theme} onToggle={onToggleTheme} /></div></header>
+    <header className="home-header"><Logo /><div className="home-tools"><ThemeToggle theme={theme} onToggle={onToggleTheme} /></div></header>
     <section className="home-hero">
       <div className="eyebrow"><span /> Partyspiel für deine Runde</div>
       <h1>Gute Leute.<br /><em>Gute Ausreden.</em><br />Ein Drink.</h1>
@@ -376,7 +375,7 @@ function InstallGuide({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: (
         ['03', 'Installation bestätigen', 'Bestätige mit „Installieren“ oder „Hinzufügen“. Danach findest du sip. auf deinem Startbildschirm und kannst es wie eine App öffnen.'],
       ];
   return <AppFrame theme={theme} className="install-screen">
-    <header className="install-header"><a className="back-button" href="/" aria-label="Zurück zur Startseite"><BackIcon /><span>Zurück</span></a><Logo light={theme === 'dark'} /><ThemeToggle theme={theme} onToggle={onToggleTheme} /></header>
+    <header className="install-header"><a className="back-button" href="/" aria-label="Zurück zur Startseite"><BackIcon /><span>Zurück</span></a><Logo /><ThemeToggle theme={theme} onToggle={onToggleTheme} /></header>
     <div className="install-content">
       <div className="eyebrow dark"><span /> sip. auf deinem Smartphone</div>
       <h1>Einmal einrichten.<br /><em>Immer bereit.</em></h1>
@@ -407,7 +406,7 @@ function SetupScreen({ theme, onToggleTheme, data, players, setPlayers, activeCa
   const cardCount = data.cards.filter((card) => activeCategoryIds.includes(card.category_id)).length;
   const canStart = players.length >= 2 && activeCategoryIds.length > 0 && cardCount > 0;
   return <AppFrame theme={theme} className="setup-screen">
-    <header className="screen-header"><BackButton onClick={onBack} /><Logo light={theme === 'dark'} /><div className="screen-header-right"><ThemeToggle theme={theme} onToggle={onToggleTheme} /><span className="step-count">01 / 02</span></div></header>
+    <header className="screen-header"><BackButton onClick={onBack} /><Logo /><div className="screen-header-right"><ThemeToggle theme={theme} onToggle={onToggleTheme} /><span className="step-count">01 / 02</span></div></header>
     <div className="setup-content">
       <div className="eyebrow dark"><span /> Erst die Runde, dann der Rest</div>
       <h2>Wer ist<br /><em>dabei?</em></h2>
@@ -582,7 +581,7 @@ function GameScreen({ theme, onToggleTheme, deck, players, onFinish, onExit }: {
   if (!card) return <FinishedScreen theme={theme} onToggleTheme={onToggleTheme} onAgain={() => undefined} onHome={onFinish} />;
   const category = card.category_name || (card.category_id === 1 ? 'Fragen' : card.category_id === 2 ? 'Gruppenaufgaben' : 'Einzelaufgaben');
   return <AppFrame theme={theme} className={`game-screen ${isTransitioning ? 'is-transitioning' : ''}`} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerCancel}>
-    <header className="game-header"><div className="game-header-left"><button className="game-exit" type="button" aria-label="Spiel beenden" onClick={(event) => { event.stopPropagation(); openQuitDialog(); }}><BackIcon /><span>Beenden</span></button></div><Logo light={theme === 'dark'} /><div className="game-header-right"><ThemeToggle theme={theme} onToggle={() => { if (!isTransitioningRef.current) onToggleTheme(); }} /><span className="round-counter">Card <strong>{index + 1}</strong> / {deck.length}</span><span className="player-count">{players.length} dabei</span></div></header>
+    <header className="game-header"><div className="game-header-left"><button className="game-exit" type="button" aria-label="Spiel beenden" onClick={(event) => { event.stopPropagation(); openQuitDialog(); }}><BackIcon /><span>Beenden</span></button></div><div className="game-header-logo"><Logo /></div><div className="game-header-right"><ThemeToggle theme={theme} onToggle={() => { if (!isTransitioningRef.current) onToggleTheme(); }} /><span className="round-counter">Card <strong>{index + 1}</strong> / {deck.length}</span><span className="player-count">{players.length} dabei</span></div></header>
     <div className="game-stage"><div key={`${card.id}-${index}`} className={`prompt-card card-${index % 3} ${isExiting ? `is-exiting is-exiting-${exitDirection}` : ''} ${isEntering ? 'is-entering' : ''}`} onAnimationEnd={handleCardAnimationEnd}><div className="card-topline"><span className="card-category">{category}</span><span className="card-mark">sip.</span></div><FitCardText text={card.text} /><div className="card-bottomline"><span>Tippen für nächste Karte</span><ArrowIcon /></div></div></div>
     <footer className="game-footer"><span>Eine Runde. Eine Karte.</span><span className="tap-indicator"><i /> tap anywhere</span></footer>
     {showQuit && <div className={`quit-backdrop ${isClosingQuit ? 'is-closing' : ''}`} role="presentation" onClick={dismissQuit}><section className="quit-dialog" role="dialog" aria-modal="true" aria-labelledby="quit-title" onClick={(event) => event.stopPropagation()}><span className="quit-dialog-mark">sip.</span><h2 id="quit-title">Spiel beenden?</h2><p>Die aktuelle Runde wird beendet. Du kannst jederzeit eine neue starten.</p><div className="quit-actions"><button className="text-button" type="button" onClick={dismissQuit}>Weiterspielen</button><button className="primary-button" type="button" onClick={leaveGame}>Beenden <ArrowIcon /></button></div></section></div>}
@@ -590,7 +589,7 @@ function GameScreen({ theme, onToggleTheme, deck, players, onFinish, onExit }: {
 }
 
 function FinishedScreen({ theme, onToggleTheme, onAgain, onHome }: { theme: Theme; onToggleTheme: () => void; onAgain: () => void; onHome: () => void }) {
-  return <AppFrame theme={theme} className="finished-screen"><header className="finished-header"><Logo light={theme === 'dark'} /><ThemeToggle theme={theme} onToggle={onToggleTheme} /></header><div className="confetti confetti-a" /><div className="confetti confetti-b" /><div className="finished-inner"><span className="finish-emoji">✦</span><div className="eyebrow dark"><span /> Deck geschafft</div><h2>Das war's<br /><em>für jetzt.</em></h2><p>Ihr habt alle Karten gespielt. Zeit für eine letzte Runde – oder für neue Geschichten.</p><div className="finished-actions"><button className="primary-button" type="button" onClick={onAgain}>Nochmal spielen <ArrowIcon /></button><button className="text-button" type="button" onClick={onHome}>Zur Startseite</button></div></div></AppFrame>;
+  return <AppFrame theme={theme} className="finished-screen"><header className="finished-header"><Logo /><ThemeToggle theme={theme} onToggle={onToggleTheme} /></header><div className="confetti confetti-a" /><div className="confetti confetti-b" /><div className="finished-inner"><span className="finish-emoji">✦</span><div className="eyebrow dark"><span /> Deck geschafft</div><h2>Das war's<br /><em>für jetzt.</em></h2><p>Ihr habt alle Karten gespielt. Zeit für eine letzte Runde – oder für neue Geschichten.</p><div className="finished-actions"><button className="primary-button" type="button" onClick={onAgain}>Nochmal spielen <ArrowIcon /></button><button className="text-button" type="button" onClick={onHome}>Zur Startseite</button></div></div></AppFrame>;
 }
 
 function AdminApp({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
@@ -604,7 +603,7 @@ function AdminApp({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () =>
 function AdminLogin({ theme, onToggleTheme, onSuccess }: { theme: Theme; onToggleTheme: () => void; onSuccess: (username: string) => void }) {
   const [username, setUsername] = useState(''); const [password, setPassword] = useState(''); const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
   const login = async (event: React.FormEvent) => { event.preventDefault(); setBusy(true); setError(''); try { const result = await api<{ user: { username: string } }>('/api/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }); onSuccess(result.user.username); } catch (loginError) { setError(loginError instanceof Error ? loginError.message : 'Login fehlgeschlagen.'); } finally { setBusy(false); } };
-  return <AppFrame theme={theme} className="admin-screen"><header className="admin-login-header"><a className="back-button" href="/" aria-label="Zurück zur App"><BackIcon /><span>Zurück zur App</span></a><Logo light={theme === 'dark'} /><ThemeToggle theme={theme} onToggle={onToggleTheme} /></header><div className="admin-grid admin-login-grid"><div className="admin-aside"><div className="admin-aside-copy"><span className="mini-sticker">behind the scenes</span><h1>Mach's<br /><em>zu deinem</em><br />Spiel.</h1><p>Verwalte Karten und Kategorien für deine nächste Runde.</p></div></div><div className="admin-panel"><div className="admin-panel-inner"><div className="eyebrow dark"><span /> Admin-Bereich</div><h2>Willkommen<br /><em>zurück.</em></h2><p className="section-intro">Melde dich an, um dein Karten-Deck zu verwalten.</p><form className="admin-form" onSubmit={login}><label>Benutzername<input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" inputMode="text" enterKeyHint="next" placeholder="admin" /></label><label>Passwort<input value={password} onChange={(event) => setPassword(event.target.value)} type="password" autoComplete="current-password" enterKeyHint="done" placeholder="••••••••" /></label>{error && <p className="field-error">{error}</p>}<button className="primary-button" type="submit" disabled={busy}>{busy ? 'Anmelden …' : 'Anmelden'} <ArrowIcon /></button></form><p className="admin-security">Deine Session ist sicher und läuft nach 8 Stunden ab.</p></div></div></div></AppFrame>;
+  return <AppFrame theme={theme} className="admin-screen"><header className="admin-login-header"><a className="back-button" href="/" aria-label="Zurück zur App"><BackIcon /><span>Zurück zur App</span></a><Logo /><ThemeToggle theme={theme} onToggle={onToggleTheme} /></header><div className="admin-grid admin-login-grid"><div className="admin-aside"><div className="admin-aside-copy"><span className="mini-sticker">behind the scenes</span><h1>Mach's<br /><em>zu deinem</em><br />Spiel.</h1><p>Verwalte Karten und Kategorien für deine nächste Runde.</p></div></div><div className="admin-panel"><div className="admin-panel-inner"><div className="eyebrow dark"><span /> Admin-Bereich</div><h2>Willkommen<br /><em>zurück.</em></h2><p className="section-intro">Melde dich an, um dein Karten-Deck zu verwalten.</p><form className="admin-form" onSubmit={login}><label>Benutzername<input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" inputMode="text" enterKeyHint="next" placeholder="admin" /></label><label>Passwort<input value={password} onChange={(event) => setPassword(event.target.value)} type="password" autoComplete="current-password" enterKeyHint="done" placeholder="••••••••" /></label>{error && <p className="field-error">{error}</p>}<button className="primary-button" type="submit" disabled={busy}>{busy ? 'Anmelden …' : 'Anmelden'} <ArrowIcon /></button></form><p className="admin-security">Deine Session ist sicher und läuft nach 8 Stunden ab.</p></div></div></div></AppFrame>;
 }
 
 function CsvImportPanel({ onImport, importing }: { onImport: (event: React.ChangeEvent<HTMLInputElement>) => void; importing: boolean }) {
@@ -659,7 +658,7 @@ function AdminDashboard({ theme, onToggleTheme, username, onLogout }: { theme: T
   const changeSearch = (value: string) => { setSearchQuery(value); setPage(1); };
 
   return <AppFrame theme={theme} className="admin-dashboard">
-    <header className="dashboard-header"><a href="/" aria-label="Zurück zur App"><Logo light={theme === 'dark'} /></a><div className="dashboard-user"><ThemeToggle theme={theme} onToggle={onToggleTheme} /><div className="dashboard-identity">Angemeldet als <strong>{username}</strong></div><button type="button" onClick={logout}>Abmelden</button></div></header>
+    <header className="dashboard-header"><a href="/" aria-label="Zurück zur App"><Logo /></a><div className="dashboard-user"><ThemeToggle theme={theme} onToggle={onToggleTheme} /><div className="dashboard-identity">Angemeldet als <strong>{username}</strong></div><button type="button" onClick={logout}>Abmelden</button></div></header>
     <div className="dashboard-content">
       <div className="dashboard-intro"><div><div className="eyebrow dark"><span /> Dein Backstage</div><h1>Deck<br /><em>Studio.</em></h1></div><div className="dashboard-stats"><div><strong>{categories.length}</strong><span>Kategorien</span></div><div><strong>{cards.length}</strong><span>Karten</span></div></div></div>
       <nav className="dashboard-tabs" aria-label="Adminbereiche"><button type="button" className={activeTab === 'deck' ? 'active' : ''} onClick={() => setActiveTab('deck')}>Deck verwalten <span>{cards.length}</span></button><button type="button" className={activeTab === 'import' ? 'active' : ''} onClick={() => setActiveTab('import')}>CSV importieren</button></nav>
@@ -889,7 +888,7 @@ function AdminDashboardEnhanced({ theme, onToggleTheme, username, onLogout }: { 
   const duplicateChecker = (text: string, excludedId: number) => findDuplicate(cards, text, excludedId);
 
   return <AppFrame theme={theme} className="admin-dashboard">
-    <header className="dashboard-header"><a href="/" aria-label="Zurück zur App"><Logo light={theme === 'dark'} /></a><div className="dashboard-user"><ThemeToggle theme={theme} onToggle={onToggleTheme} /><div className="dashboard-identity">Angemeldet als <strong>{username}</strong></div><button type="button" onClick={logout}>Abmelden</button></div></header>
+    <header className="dashboard-header"><a href="/" aria-label="Zurück zur App"><Logo /></a><div className="dashboard-user"><ThemeToggle theme={theme} onToggle={onToggleTheme} /><div className="dashboard-identity">Angemeldet als <strong>{username}</strong></div><button type="button" onClick={logout}>Abmelden</button></div></header>
     <div className="dashboard-content"><div className="dashboard-intro"><div><div className="eyebrow dark"><span /> Dein Backstage</div><h1>Deck<br /><em>Studio.</em></h1></div><div className="dashboard-stats"><div><strong>{categories.length}</strong><span>Kategorien</span></div><div><strong>{cards.length}</strong><span>Karten</span></div></div></div>
       <nav className="dashboard-tabs" aria-label="Adminbereiche"><button type="button" className={activeTab === 'deck' ? 'active' : ''} onClick={() => setActiveTab('deck')}>Deck verwalten <span>{cards.length}</span></button><button type="button" className={activeTab === 'import' ? 'active' : ''} onClick={() => setActiveTab('import')}>CSV importieren</button></nav>
       {activeTab === 'import' ? <CsvImportPanel onImport={importCsv} importing={importing} /> : <>
