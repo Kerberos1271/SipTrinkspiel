@@ -8,6 +8,40 @@ type GameData = { categories: Category[]; cards: Card[] };
 type Screen = 'home' | 'setup' | 'game' | 'finished';
 type Theme = 'dark' | 'light';
 
+const THEME_COLORS: Record<Theme, string> = {
+  light: '#f8fafc',
+  dark: '#09090b',
+};
+
+function syncThemeColor(theme: Theme) {
+  if (typeof document === 'undefined') return;
+
+  let themeColorMeta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  if (!themeColorMeta) {
+    themeColorMeta = document.createElement('meta');
+    themeColorMeta.name = 'theme-color';
+    document.head.appendChild(themeColorMeta);
+  }
+
+  themeColorMeta.setAttribute('content', THEME_COLORS[theme]);
+}
+
+function applyTheme(theme: Theme) {
+  if (typeof document === 'undefined') return;
+
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.style.colorScheme = theme;
+  syncThemeColor(theme);
+}
+
+function getInitialTheme(): Theme {
+  if (typeof window === 'undefined') return 'dark';
+
+  const theme = window.localStorage.getItem('sip-theme') === 'light' ? 'light' : 'dark';
+  applyTheme(theme);
+  return theme;
+}
+
 type InstallPromptOutcome = 'accepted' | 'dismissed' | 'unavailable';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -242,15 +276,10 @@ function usePwaInstall() {
 
 function App() {
   const pwaInstall = usePwaInstall();
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window === 'undefined') return 'dark';
-    return window.localStorage.getItem('sip-theme') === 'light' ? 'light' : 'dark';
-  });
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
   useEffect(() => {
     window.localStorage.setItem('sip-theme', theme);
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = theme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#f8fafc' : '#09090b');
+    applyTheme(theme);
   }, [theme]);
   const toggleTheme = () => setTheme((current) => current === 'light' ? 'dark' : 'light');
   if (window.location.pathname.startsWith('/admin')) return <AdminApp theme={theme} onToggleTheme={toggleTheme} />;
