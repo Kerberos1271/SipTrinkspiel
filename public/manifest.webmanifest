@@ -9,8 +9,8 @@
   "scope": "/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone"],
-  "background_color": "#2d2942",
-  "theme_color": "#2d2942",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
   "orientation": "portrait",
   "categories": ["games", "entertainment"],
   "icons": [

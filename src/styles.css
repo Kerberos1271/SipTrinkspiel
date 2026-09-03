@@ -5,29 +5,32 @@
   font-family: 'DM Sans', system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --color-bg: #302d45;
-  --color-bg-deep: #27243a;
-  --color-canvas: #302d45;
-  --color-canvas-image: radial-gradient(circle at 88% 8%, rgba(200, 111, 91, .16), transparent 28%), radial-gradient(circle at 12% 78%, rgba(105, 91, 157, .2), transparent 34%), radial-gradient(circle at 70% 108%, rgba(80, 126, 143, .12), transparent 30%);
-  --color-surface: #403b58;
-  --color-surface-raised: #484260;
-  --color-surface-alt: #263b46;
-  --color-surface-soft: rgba(255, 255, 255, .08);
-  --color-text: #fbf5eb;
-  --color-text-muted: rgba(251, 245, 235, .67);
-  --color-text-subtle: rgba(251, 245, 235, .48);
-  --color-text-faint: rgba(251, 245, 235, .35);
-  --color-border: rgba(251, 245, 235, .16);
-  --color-border-strong: rgba(251, 245, 235, .3);
-  --color-primary: #e3c68c;
-  --color-primary-contrast: #2d2942;
-  --color-secondary: #c86f5b;
-  --color-info: #a9c3cf;
-  --color-danger: #d77c68;
-  --color-input: rgba(0, 0, 0, .14);
-  --color-overlay: rgba(18, 16, 28, .55);
-  --color-shadow: rgba(10, 9, 18, .28);
-  --color-avatar: #a9c3cf;
+  /* Dark palette: neutral obsidian surfaces with a warm amber signal color. */
+  --color-bg: #09090b;
+  --color-bg-deep: #0c0d0e;
+  --color-canvas: #09090b;
+  --color-canvas-image: none;
+  --color-surface: #18181b;
+  --color-surface-raised: #202024;
+  --color-surface-alt: #141417;
+  --color-surface-soft: rgba(255, 255, 255, .05);
+  --color-text: #f4f4f5;
+  --color-text-muted: #a1a1aa;
+  --color-text-subtle: #71717a;
+  --color-text-faint: #52525b;
+  --color-border: rgba(255, 255, 255, .08);
+  --color-border-strong: rgba(255, 255, 255, .14);
+  --color-primary: #f4f4f5;
+  --color-primary-contrast: #09090b;
+  --color-secondary: #f59e0b;
+  --color-info: #a1a1aa;
+  --color-danger: #f87171;
+  --color-warning: #fbbf24;
+  --color-input: rgba(255, 255, 255, .04);
+  --color-overlay: rgba(9, 9, 11, .75);
+  --color-shadow: rgba(0, 0, 0, .28);
+  --color-avatar: #f59e0b;
+  --color-glass: rgba(9, 9, 11, .75);
 }
 
 :root[data-theme='light'] {
@@ -35,26 +38,28 @@
   --color-bg: #fbf1e5;
   --color-bg-deep: #f5e8da;
   --color-canvas: #fbf1e5;
-  --color-canvas-image: radial-gradient(circle at 88% 8%, rgba(200, 111, 91, .12), transparent 28%), radial-gradient(circle at 12% 78%, rgba(132, 117, 170, .13), transparent 34%), radial-gradient(circle at 70% 108%, rgba(121, 168, 180, .1), transparent 30%);
+  --color-canvas-image: radial-gradient(circle at 88% 8%, rgba(200, 111, 91, .12), transparent 28%), radial-gradient(circle at 12% 78%, rgba(113, 113, 122, .13), transparent 34%), radial-gradient(circle at 70% 108%, rgba(121, 168, 180, .1), transparent 30%);
   --color-surface: #f4eadd;
   --color-surface-raised: #fffaf2;
   --color-surface-alt: #e5eef0;
-  --color-surface-soft: rgba(45, 41, 66, .055);
-  --color-text: #2d2942;
-  --color-text-muted: rgba(45, 41, 66, .66);
-  --color-text-subtle: rgba(45, 41, 66, .5);
-  --color-text-faint: rgba(45, 41, 66, .36);
-  --color-border: rgba(45, 41, 66, .14);
-  --color-border-strong: rgba(45, 41, 66, .28);
+  --color-surface-soft: rgba(39, 39, 42, .055);
+  --color-text: #27272a;
+  --color-text-muted: rgba(39, 39, 42, .66);
+  --color-text-subtle: rgba(39, 39, 42, .5);
+  --color-text-faint: rgba(39, 39, 42, .36);
+  --color-border: rgba(39, 39, 42, .14);
+  --color-border-strong: rgba(39, 39, 42, .28);
   --color-primary: #cda968;
-  --color-primary-contrast: #2d2942;
+  --color-primary-contrast: #27272a;
   --color-secondary: #b9634f;
   --color-info: #79a8b4;
   --color-danger: #bd5e4d;
+  --color-warning: #b7791f;
   --color-input: rgba(255, 255, 255, .48);
-  --color-overlay: rgba(45, 41, 66, .34);
-  --color-shadow: rgba(45, 41, 66, .14);
+  --color-overlay: rgba(39, 39, 42, .34);
+  --color-shadow: rgba(39, 39, 42, .14);
   --color-avatar: #9fc4c9;
+  --color-glass: rgba(251, 241, 229, .78);
 }
 
 * { box-sizing: border-box; }
@@ -213,7 +218,7 @@ h1 em, h2 em { color: var(--color-secondary); font-style: normal; }
 @media (min-width: 701px) { .home-screen { padding-right: clamp(2rem, 7vw, 8rem); padding-left: clamp(2rem, 7vw, 8rem); }.setup-content { padding-top: 6rem; }.game-screen { padding-right: clamp(2rem, 8vw, 9rem); padding-left: clamp(2rem, 8vw, 9rem); }.prompt-card { min-height: min(67dvh, 40rem); } }
 
 /* Shared navigation, form and interaction primitives. */
-:root { --control-size: 44px; --header-control-gap: .75rem; --color-focus: #e3c68c; }
+:root { --control-size: 44px; --header-control-gap: .75rem; --color-focus: #f59e0b; }
 :root[data-theme='light'] { --color-focus: #b9634f; }
 .home-header, .screen-header, .install-header, .game-header, .finished-header, .dashboard-header, .admin-login-header { min-height: var(--control-size); }
 .admin-login-header { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 1rem; position: relative; z-index: 1; height: 5.4rem; padding: 0 max(1.25rem, calc((100vw - 74rem) / 2)); border-bottom: 1px solid var(--color-border); }
@@ -561,4 +566,279 @@ button:active:not(:disabled), a:active { transform: scale(.97); }
 @media (prefers-reduced-motion: reduce) {
   .prompt-card { transition-duration: .01ms; }
   .prompt-card.is-entering { animation-duration: .01ms; }
+}
+
+/* Modern dark theme: obsidian canvas, layered surfaces, and precise micro-borders. */
+:root[data-theme='dark'] .app-frame {
+  background-color: var(--color-canvas);
+  background-image: none;
+}
+
+:root[data-theme='dark'] .home-header,
+:root[data-theme='dark'] .screen-header,
+:root[data-theme='dark'] .install-header,
+:root[data-theme='dark'] .game-header,
+:root[data-theme='dark'] .finished-header,
+:root[data-theme='dark'] .dashboard-header,
+:root[data-theme='dark'] .admin-login-header {
+  background: var(--color-glass);
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-bottom-color: rgba(255, 255, 255, .1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+:root[data-theme='dark'] .home-header,
+:root[data-theme='dark'] .screen-header,
+:root[data-theme='dark'] .install-header,
+:root[data-theme='dark'] .game-header {
+  border-radius: .8rem;
+  padding-block: .65rem;
+}
+
+:root[data-theme='dark'] .finished-header {
+  padding: .65rem .75rem;
+  border-radius: .8rem;
+}
+
+:root[data-theme='dark'] .dashboard-header,
+:root[data-theme='dark'] .admin-login-header {
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+}
+
+:root[data-theme='dark'] .logo span,
+:root[data-theme='dark'] h1 em,
+:root[data-theme='dark'] h2 em,
+:root[data-theme='dark'] .eyebrow > span,
+:root[data-theme='dark'] .heading-icon,
+:root[data-theme='dark'] .dashboard-user button,
+:root[data-theme='dark'] .install-back-link,
+:root[data-theme='dark'] .add-player button,
+:root[data-theme='dark'] .inline-form button,
+:root[data-theme='dark'] .loading-dots {
+  color: var(--color-secondary);
+}
+
+:root[data-theme='dark'] .eyebrow > span {
+  background: var(--color-secondary);
+}
+
+/* Every game card stays neutral; category variation comes from the surrounding UI. */
+:root[data-theme='dark'] .prompt-card,
+:root[data-theme='dark'] .prompt-card.card-1,
+:root[data-theme='dark'] .prompt-card.card-2 {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface) !important;
+  background-image: none;
+  color: var(--color-text);
+  box-shadow: none !important;
+}
+
+:root[data-theme='dark'] .card-topline,
+:root[data-theme='dark'] .card-bottomline {
+  color: var(--color-text-muted);
+}
+
+:root[data-theme='dark'] .card-category,
+:root[data-theme='dark'] .card-mark,
+:root[data-theme='dark'] .tap-indicator,
+:root[data-theme='dark'] .tap-indicator i {
+  color: var(--color-secondary);
+}
+
+:root[data-theme='dark'] .tap-indicator i {
+  background: var(--color-secondary);
+}
+
+:root[data-theme='dark'] .card-bottomline {
+  color: var(--color-text-subtle);
+}
+
+:root[data-theme='dark'] .admin-card,
+:root[data-theme='dark'] .csv-import-card,
+:root[data-theme='dark'] .install-step,
+:root[data-theme='dark'] .admin-prompt-row:not(.inline-editing) {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: none;
+}
+
+:root[data-theme='dark'] .manage-cards {
+  background: var(--color-surface-alt);
+}
+
+:root[data-theme='dark'] .player-chip,
+:root[data-theme='dark'] .card-search,
+:root[data-theme='dark'] .form-row select,
+:root[data-theme='dark'] .card-create-form textarea,
+:root[data-theme='dark'] .admin-form input,
+:root[data-theme='dark'] .quick-category-select,
+:root[data-theme='dark'] .inline-category-select,
+:root[data-theme='dark'] .category-rename-input,
+:root[data-theme='dark'] .inline-editing textarea {
+  background: var(--color-input);
+  border-color: var(--color-border);
+}
+
+:root[data-theme='dark'] .avatar {
+  background: var(--color-secondary);
+  color: var(--color-primary-contrast);
+}
+
+:root[data-theme='dark'] .count-badge,
+:root[data-theme='dark'] .placeholder-token {
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 28%, var(--color-border));
+  background: color-mix(in srgb, var(--color-secondary) 13%, transparent);
+  color: var(--color-secondary);
+}
+
+:root[data-theme='dark'] .marker-lime,
+:root[data-theme='dark'] .marker-coral {
+  background: var(--color-secondary);
+}
+
+:root[data-theme='dark'] .marker-sky {
+  background: var(--color-info);
+}
+
+/* Primary actions use premium off-white contrast; amber remains the interaction signal. */
+:root[data-theme='dark'] .primary-button,
+:root[data-theme='dark'] .play-button,
+:root[data-theme='dark'] .small-submit,
+:root[data-theme='dark'] .desktop-create-button,
+:root[data-theme='dark'] .csv-file-button,
+:root[data-theme='dark'] .card-fab {
+  border: 1px solid transparent;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+:root[data-theme='dark'] .primary-button:hover,
+:root[data-theme='dark'] .primary-button:focus-visible,
+:root[data-theme='dark'] .play-button:hover,
+:root[data-theme='dark'] .play-button:focus-visible,
+:root[data-theme='dark'] .small-submit:hover,
+:root[data-theme='dark'] .small-submit:focus-visible,
+:root[data-theme='dark'] .desktop-create-button:hover,
+:root[data-theme='dark'] .desktop-create-button:focus-visible,
+:root[data-theme='dark'] .csv-file-button:hover,
+:root[data-theme='dark'] .csv-file-button:focus-visible,
+:root[data-theme='dark'] .card-fab:hover,
+:root[data-theme='dark'] .card-fab:focus-visible {
+  background: #e4e4e7;
+  color: var(--color-primary-contrast);
+}
+
+:root[data-theme='dark'] .play-button:hover,
+:root[data-theme='dark'] .play-button:focus-visible {
+  box-shadow: 0 12px 35px var(--color-shadow);
+}
+
+:root[data-theme='dark'] .play-arrow {
+  background: var(--color-primary-contrast);
+  color: var(--color-primary);
+}
+
+/* Secondary controls share one quiet, tactile surface. */
+:root[data-theme='dark'] .theme-toggle,
+:root[data-theme='dark'] .game-exit,
+:root[data-theme='dark'] .row-action,
+:root[data-theme='dark'] .drawer-close,
+:root[data-theme='dark'] .placeholder-tools button,
+:root[data-theme='dark'] .category-order-actions button,
+:root[data-theme='dark'] .card-filter button,
+:root[data-theme='dark'] .install-tabs button {
+  border-color: rgba(255, 255, 255, .1);
+  background: rgba(255, 255, 255, .05);
+  color: var(--color-text);
+}
+
+:root[data-theme='dark'] .theme-toggle:hover,
+:root[data-theme='dark'] .theme-toggle:focus-visible,
+:root[data-theme='dark'] .game-exit:hover,
+:root[data-theme='dark'] .game-exit:focus-visible,
+:root[data-theme='dark'] .row-action:hover,
+:root[data-theme='dark'] .row-action:focus-visible,
+:root[data-theme='dark'] .drawer-close:hover,
+:root[data-theme='dark'] .drawer-close:focus-visible,
+:root[data-theme='dark'] .placeholder-tools button:hover,
+:root[data-theme='dark'] .category-order-actions button:hover,
+:root[data-theme='dark'] .card-filter button:hover,
+:root[data-theme='dark'] .install-tabs button:hover {
+  border-color: var(--color-border-strong);
+  background: rgba(255, 255, 255, .08);
+  color: var(--color-text);
+}
+
+:root[data-theme='dark'] .theme-toggle-icon {
+  background: var(--color-secondary);
+  color: var(--color-primary-contrast);
+}
+
+:root[data-theme='dark'] .card-filter button.active,
+:root[data-theme='dark'] .install-tabs button.active,
+:root[data-theme='dark'] .row-action.primary-action {
+  border-color: transparent;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+:root[data-theme='dark'] .text-button,
+:root[data-theme='dark'] .back-button {
+  color: var(--color-text-muted);
+}
+
+:root[data-theme='dark'] .text-button:hover,
+:root[data-theme='dark'] .text-button:focus-visible,
+:root[data-theme='dark'] .back-button:hover,
+:root[data-theme='dark'] .back-button:focus-visible {
+  color: var(--color-text);
+}
+
+:root[data-theme='dark'] .quit-dialog,
+:root[data-theme='dark'] .confirm-dialog,
+:root[data-theme='dark'] .card-editor-drawer,
+:root[data-theme='dark'] .toast {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-raised);
+  box-shadow: none;
+}
+
+:root[data-theme='dark'] .quit-backdrop,
+:root[data-theme='dark'] .confirm-backdrop,
+:root[data-theme='dark'] .card-editor-backdrop {
+  background: var(--color-overlay);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+:root[data-theme='dark'] .quit-dialog-mark,
+:root[data-theme='dark'] .csv-import-card .card-kicker,
+:root[data-theme='dark'] .csv-import-card h2 em,
+:root[data-theme='dark'] .csv-instructions code,
+:root[data-theme='dark'] .placeholder-tools code,
+:root[data-theme='dark'] .editor-hint code,
+:root[data-theme='dark'] .prompt-category {
+  color: var(--color-secondary);
+}
+
+:root[data-theme='dark'] .prompt-category {
+  border-color: color-mix(in srgb, var(--color-secondary) 35%, transparent);
+  background: color-mix(in srgb, var(--color-secondary) 10%, transparent);
+}
+
+:root[data-theme='dark'] .install-step-number,
+:root[data-theme='dark'] .finish-emoji {
+  background: var(--color-secondary);
+  color: var(--color-primary-contrast);
+}
+
+:root[data-theme='dark'] .confetti {
+  background: var(--color-secondary);
+}
+
+:root[data-theme='dark'] .confetti-b {
+  background: var(--color-info);
 }

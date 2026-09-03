@@ -250,7 +250,7 @@ function App() {
     window.localStorage.setItem('sip-theme', theme);
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#fbf1e5' : '#2d2942');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#fbf1e5' : '#09090b');
   }, [theme]);
   const toggleTheme = () => setTheme((current) => current === 'light' ? 'dark' : 'light');
   if (window.location.pathname.startsWith('/admin')) return <AdminApp theme={theme} onToggleTheme={toggleTheme} />;
