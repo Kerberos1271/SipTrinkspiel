@@ -327,8 +327,19 @@ function PlayerApp({ theme, onToggleTheme, pwaInstall }: { theme: Theme; onToggl
   return <HomeScreen theme={theme} onToggleTheme={onToggleTheme} onPlay={() => setScreen('setup')} pwaInstall={pwaInstall} />;
 }
 
-function AppFrame({ children, className = '', onClick, theme = 'dark' }: { children: React.ReactNode; className?: string; onClick?: () => void; theme?: Theme }) {
-  return <main className={`app-frame theme-${theme} ${className}`} onClick={onClick}>{children}</main>;
+type AppFrameProps = {
+  children: React.ReactNode;
+  className?: string;
+  theme?: Theme;
+  onClick?: React.MouseEventHandler<HTMLElement>;
+  onPointerDown?: React.PointerEventHandler<HTMLElement>;
+  onPointerMove?: React.PointerEventHandler<HTMLElement>;
+  onPointerUp?: React.PointerEventHandler<HTMLElement>;
+  onPointerCancel?: React.PointerEventHandler<HTMLElement>;
+};
+
+function AppFrame({ children, className = '', theme = 'dark', onClick, onPointerDown, onPointerMove, onPointerUp, onPointerCancel }: AppFrameProps) {
+  return <main className={`app-frame theme-${theme} ${className}`} onClick={onClick} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerCancel}>{children}</main>;
 }
 
 function HomeScreen({ theme, onToggleTheme, onPlay, pwaInstall }: { theme: Theme; onToggleTheme: () => void; onPlay: () => void; pwaInstall: ReturnType<typeof usePwaInstall> }) {
@@ -411,69 +422,134 @@ function SetupScreen({ theme, onToggleTheme, data, players, setPlayers, activeCa
 function GameScreen({ theme, onToggleTheme, deck, players, onFinish, onExit }: { theme: Theme; onToggleTheme: () => void; deck: Card[]; players: string[]; onFinish: () => void; onExit: () => void }) {
   const [index, setIndex] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
+  const [isEntering, setIsEntering] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [exitDirection, setExitDirection] = useState<'left' | 'right'>('left');
   const [showQuit, setShowQuit] = useState(false);
   const [isClosingQuit, setIsClosingQuit] = useState(false);
   const card = deck[index];
+  const indexRef = useRef(0);
+  const isTransitioningRef = useRef(false);
   const transitionTimerRef = useRef<number | null>(null);
-  const advancingRef = useRef(false);
-  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
-  const suppressClickUntilRef = useRef(0);
-  const SWIPE_THRESHOLD = 64;
+  const enterTimerRef = useRef<number | null>(null);
+  const pointerGestureRef = useRef<{ pointerId: number; startX: number; startY: number; startedAt: number } | null>(null);
   const CARD_EXIT_MS = 220;
+  const CARD_ENTER_MS = 220;
+  const SWIPE_MIN_DISTANCE = 45;
+  const TAP_MAX_DISTANCE = 10;
+  const TAP_MAX_DURATION = 250;
 
-  const next = (direction: 'left' | 'right' = 'left') => {
-    if (advancingRef.current || showQuit) return;
-    advancingRef.current = true;
+  useEffect(() => {
+    indexRef.current = index;
+  }, [index]);
+
+  const clearTransitionTimers = useCallback(() => {
+    if (transitionTimerRef.current !== null) window.clearTimeout(transitionTimerRef.current);
+    if (enterTimerRef.current !== null) window.clearTimeout(enterTimerRef.current);
+    transitionTimerRef.current = null;
+    enterTimerRef.current = null;
+  }, []);
+
+  const unlockTransition = useCallback(() => {
+    if (!isTransitioningRef.current) return;
+    clearTransitionTimers();
+    isTransitioningRef.current = false;
+    setIsTransitioning(false);
+    setIsEntering(false);
+  }, [clearTransitionTimers]);
+
+  const next = useCallback((direction: 'left' | 'right' = 'left') => {
+    if (isTransitioningRef.current || showQuit || deck.length === 0) return;
+
+    const currentIndex = indexRef.current;
+    isTransitioningRef.current = true;
+    setIsTransitioning(true);
+    setIsEntering(false);
     setExitDirection(direction);
     setIsExiting(true);
+    clearTransitionTimers();
     transitionTimerRef.current = window.setTimeout(() => {
-      if (index >= deck.length - 1) {
+      transitionTimerRef.current = null;
+      if (currentIndex >= deck.length - 1) {
         onFinish();
         return;
       }
-      setIndex((value) => value + 1);
+
+      const nextIndex = currentIndex + 1;
+      indexRef.current = nextIndex;
+      setIndex(nextIndex);
       setIsExiting(false);
-      advancingRef.current = false;
+      setIsEntering(true);
+      enterTimerRef.current = window.setTimeout(unlockTransition, CARD_ENTER_MS);
     }, CARD_EXIT_MS);
+  }, [CARD_EXIT_MS, clearTransitionTimers, deck.length, onFinish, showQuit, unlockTransition]);
+
+  const isInteractiveTarget = (target: EventTarget | null) => target instanceof Element
+    && Boolean(target.closest('button, a, input, textarea, select, [role="dialog"]'));
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLElement>) => {
+    if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0) || isTransitioningRef.current || showQuit || isInteractiveTarget(event.target)) return;
+
+    pointerGestureRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      startedAt: performance.now(),
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+
+    // The game has no click fallback. Prevent native touch activation so a
+    // browser cannot synthesize a second click after this pointer gesture.
+    if (event.pointerType !== 'mouse') event.preventDefault();
   };
 
-  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
-    if (advancingRef.current || showQuit || event.touches.length !== 1) return;
-    const touch = event.touches[0];
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  const handlePointerMove = (event: React.PointerEvent<HTMLElement>) => {
+    const gesture = pointerGestureRef.current;
+    if (!gesture || gesture.pointerId !== event.pointerId || isTransitioningRef.current) return;
+
+    const deltaX = event.clientX - gesture.startX;
+    const deltaY = event.clientY - gesture.startY;
+    if (event.pointerType !== 'mouse' && Math.abs(deltaX) > 10 && Math.abs(deltaX) > Math.abs(deltaY)) event.preventDefault();
   };
 
-  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
-    const start = touchStartRef.current;
-    if (!start || event.touches.length !== 1) return;
-    const touch = event.touches[0];
-    const deltaX = touch.clientX - start.x;
-    const deltaY = touch.clientY - start.y;
-    if (Math.abs(deltaX) > 10 && Math.abs(deltaX) > Math.abs(deltaY)) event.preventDefault();
-  };
+  const handlePointerUp = (event: React.PointerEvent<HTMLElement>) => {
+    const gesture = pointerGestureRef.current;
+    pointerGestureRef.current = null;
+    if (!gesture || gesture.pointerId !== event.pointerId) return;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    if (isTransitioningRef.current || showQuit) return;
 
-  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
-    const start = touchStartRef.current;
-    touchStartRef.current = null;
-    if (!start || advancingRef.current || showQuit) return;
-    const touch = event.changedTouches[0];
-    if (!touch) return;
-    const deltaX = touch.clientX - start.x;
-    const deltaY = touch.clientY - start.y;
-    if (Math.abs(deltaX) >= SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY)) {
-      suppressClickUntilRef.current = Date.now() + 500;
+    const deltaX = event.clientX - gesture.startX;
+    const deltaY = event.clientY - gesture.startY;
+    const elapsedTime = performance.now() - gesture.startedAt;
+    const horizontalDistance = Math.abs(deltaX);
+    const verticalDistance = Math.abs(deltaY);
+    const isSwipe = horizontalDistance > SWIPE_MIN_DISTANCE && horizontalDistance > verticalDistance * 1.5;
+    const isTap = horizontalDistance < TAP_MAX_DISTANCE && verticalDistance < TAP_MAX_DISTANCE && elapsedTime < TAP_MAX_DURATION;
+
+    // Only an unambiguous swipe or tap changes the card. In-between gestures
+    // are intentionally ignored, especially accidental vertical drags.
+    if (isSwipe) {
+      event.preventDefault();
       next(deltaX < 0 ? 'left' : 'right');
+    } else if (isTap) {
+      event.preventDefault();
+      next('left');
     }
   };
 
-  const handleTouchCancel = () => {
-    touchStartRef.current = null;
+  const handlePointerCancel = (event: React.PointerEvent<HTMLElement>) => {
+    if (pointerGestureRef.current?.pointerId === event.pointerId) pointerGestureRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
   };
 
-  const handleGameClick = () => {
-    if (Date.now() < suppressClickUntilRef.current) return;
-    next('left');
+  const handleCardAnimationEnd = (event: React.AnimationEvent<HTMLDivElement>) => {
+    if (event.animationName === 'game-card-enter' && isTransitioningRef.current && !isExiting) unlockTransition();
+  };
+
+  const openQuitDialog = () => {
+    if (isTransitioningRef.current || isClosingQuit) return;
+    setShowQuit(true);
   };
 
   const dismissQuit = () => {
@@ -488,19 +564,26 @@ function GameScreen({ theme, onToggleTheme, deck, players, onFinish, onExit }: {
   };
 
   useEffect(() => {
-    const handler = (event: KeyboardEvent) => { if (event.key === ' ' || event.key === 'Enter') next('left'); };
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === ' ' || event.key === 'Enter') {
+        event.preventDefault();
+        next('left');
+      }
+    };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [index, deck.length, showQuit, isExiting]);
+  }, [next]);
   useEffect(() => () => {
-    if (transitionTimerRef.current !== null) window.clearTimeout(transitionTimerRef.current);
-  }, []);
+    clearTransitionTimers();
+    pointerGestureRef.current = null;
+    isTransitioningRef.current = false;
+  }, [clearTransitionTimers]);
 
   if (!card) return <FinishedScreen theme={theme} onToggleTheme={onToggleTheme} onAgain={() => undefined} onHome={onFinish} />;
   const category = card.category_name || (card.category_id === 1 ? 'Fragen' : card.category_id === 2 ? 'Gruppenaufgaben' : 'Einzelaufgaben');
-  return <AppFrame theme={theme} className="game-screen" onClick={handleGameClick}>
-    <header className="game-header"><div className="game-header-left"><button className="game-exit" type="button" aria-label="Spiel beenden" onClick={(event) => { event.stopPropagation(); setShowQuit(true); }}><BackIcon /><span>Beenden</span></button></div><Logo light={theme === 'dark'} /><div className="game-header-right"><ThemeToggle theme={theme} onToggle={onToggleTheme} /><span className="round-counter">Card <strong>{index + 1}</strong> / {deck.length}</span><span className="player-count">{players.length} dabei</span></div></header>
-    <div className="game-stage"><div key={`${card.id}-${index}`} className={`prompt-card card-${index % 3} ${isExiting ? `is-exiting is-exiting-${exitDirection}` : ''}`} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd} onTouchCancel={handleTouchCancel}><div className="card-topline"><span className="card-category">{category}</span><span className="card-mark">sip.</span></div><FitCardText text={card.text} /><div className="card-bottomline"><span>Tippen für nächste Karte</span><ArrowIcon /></div></div></div>
+  return <AppFrame theme={theme} className={`game-screen ${isTransitioning ? 'is-transitioning' : ''}`} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerCancel}>
+    <header className="game-header"><div className="game-header-left"><button className="game-exit" type="button" aria-label="Spiel beenden" onClick={(event) => { event.stopPropagation(); openQuitDialog(); }}><BackIcon /><span>Beenden</span></button></div><Logo light={theme === 'dark'} /><div className="game-header-right"><ThemeToggle theme={theme} onToggle={() => { if (!isTransitioningRef.current) onToggleTheme(); }} /><span className="round-counter">Card <strong>{index + 1}</strong> / {deck.length}</span><span className="player-count">{players.length} dabei</span></div></header>
+    <div className="game-stage"><div key={`${card.id}-${index}`} className={`prompt-card card-${index % 3} ${isExiting ? `is-exiting is-exiting-${exitDirection}` : ''} ${isEntering ? 'is-entering' : ''}`} onAnimationEnd={handleCardAnimationEnd}><div className="card-topline"><span className="card-category">{category}</span><span className="card-mark">sip.</span></div><FitCardText text={card.text} /><div className="card-bottomline"><span>Tippen für nächste Karte</span><ArrowIcon /></div></div></div>
     <footer className="game-footer"><span>Eine Runde. Eine Karte.</span><span className="tap-indicator"><i /> tap anywhere</span></footer>
     {showQuit && <div className={`quit-backdrop ${isClosingQuit ? 'is-closing' : ''}`} role="presentation" onClick={dismissQuit}><section className="quit-dialog" role="dialog" aria-modal="true" aria-labelledby="quit-title" onClick={(event) => event.stopPropagation()}><span className="quit-dialog-mark">sip.</span><h2 id="quit-title">Spiel beenden?</h2><p>Die aktuelle Runde wird beendet. Du kannst jederzeit eine neue starten.</p><div className="quit-actions"><button className="text-button" type="button" onClick={dismissQuit}>Weiterspielen</button><button className="primary-button" type="button" onClick={leaveGame}>Beenden <ArrowIcon /></button></div></section></div>}
   </AppFrame>;

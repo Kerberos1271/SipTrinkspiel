@@ -470,28 +470,6 @@ button:active:not(:disabled), a:active { transform: scale(.97); }
   .prompt-card { height: min(67dvh, 40rem); max-height: min(67dvh, 40rem); }
 }
 
-/* Straight, touch-friendly game cards with a desktop-only hover affordance. */
-.prompt-card {
-  touch-action: pan-y;
-  will-change: transform, opacity;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .prompt-card:not(.is-exiting):hover,
-  .prompt-card:not(.is-exiting):focus-visible {
-    transform: scale(1.025);
-  }
-}
-
-@keyframes game-card-enter {
-  from { opacity: 0; transform: translateY(.6rem) scale(.985); }
-  to { opacity: 1; transform: none; }
-}
-
-.prompt-card:not(.is-exiting) {
-  animation: game-card-enter .22s ease-out both;
-}
-
 /* Keep every icon on the same flex center line, independent of font metrics. */
 .ui-icon {
   display: block;
@@ -535,4 +513,46 @@ button:active:not(:disabled), a:active { transform: scale(.97); }
 
 @media (prefers-reduced-motion: reduce) {
   .prompt-card { transition-duration: .01ms; animation-duration: .01ms; }
+}
+
+/* Game input/animation contract: one pointer stream, compositor-only motion. */
+.game-screen {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.prompt-card {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transform: translate3d(0, 0, 0);
+  transition: transform .22s cubic-bezier(.22, .8, .25, 1), opacity .22s ease;
+  will-change: transform, opacity;
+  animation: none;
+  backface-visibility: hidden;
+}
+
+.prompt-card.is-exiting-left { transform: translate3d(-115%, 0, 0); }
+.prompt-card.is-exiting-right { transform: translate3d(115%, 0, 0); }
+.prompt-card:not(.is-entering) { animation: none; }
+.prompt-card.is-entering { animation: game-card-enter .22s ease-out both; }
+
+@keyframes game-card-enter {
+  from { opacity: 0; transform: translate3d(0, .6rem, 0) scale(.985); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .prompt-card:not(.is-exiting):hover,
+  .prompt-card:not(.is-exiting):focus-visible {
+    transform: translate3d(0, 0, 0) scale(1.025);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prompt-card { transition-duration: .01ms; }
+  .prompt-card.is-entering { animation-duration: .01ms; }
 }
