@@ -406,7 +406,7 @@ function SetupScreen({ theme, onToggleTheme, data, players, setPlayers, activeCa
   const cardCount = data.cards.filter((card) => activeCategoryIds.includes(card.category_id)).length;
   const canStart = players.length >= 2 && activeCategoryIds.length > 0 && cardCount > 0;
   return <AppFrame theme={theme} className="setup-screen">
-    <header className="screen-header"><BackButton onClick={onBack} /><Logo /><div className="screen-header-right"><ThemeToggle theme={theme} onToggle={onToggleTheme} /><span className="step-count">01 / 02</span></div></header>
+    <header className="screen-header"><BackButton onClick={onBack} /><Logo /><div className="screen-header-right"><ThemeToggle theme={theme} onToggle={onToggleTheme} /></div></header>
     <div className="setup-content">
       <div className="eyebrow dark"><span /> Erst die Runde, dann der Rest</div>
       <h2>Wer ist<br /><em>dabei?</em></h2>
@@ -581,9 +581,9 @@ function GameScreen({ theme, onToggleTheme, deck, players, onFinish, onExit }: {
   if (!card) return <FinishedScreen theme={theme} onToggleTheme={onToggleTheme} onAgain={() => undefined} onHome={onFinish} />;
   const category = card.category_name || (card.category_id === 1 ? 'Fragen' : card.category_id === 2 ? 'Gruppenaufgaben' : 'Einzelaufgaben');
   return <AppFrame theme={theme} className={`game-screen ${isTransitioning ? 'is-transitioning' : ''}`} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerCancel}>
-    <header className="game-header"><div className="game-header-left"><button className="game-exit" type="button" aria-label="Spiel beenden" onClick={(event) => { event.stopPropagation(); openQuitDialog(); }}><BackIcon /><span>Beenden</span></button></div><div className="game-header-logo"><Logo /></div><div className="game-header-right"><ThemeToggle theme={theme} onToggle={() => { if (!isTransitioningRef.current) onToggleTheme(); }} /><span className="round-counter">Card <strong>{index + 1}</strong> / {deck.length}</span><span className="player-count">{players.length} dabei</span></div></header>
+    <header className="game-header"><div className="game-header-left"><button className="game-exit" type="button" aria-label="Spiel beenden" onClick={(event) => { event.stopPropagation(); openQuitDialog(); }}><BackIcon /><span>Beenden</span></button></div><div className="game-header-logo"><Logo /></div><div className="game-header-right"><ThemeToggle theme={theme} onToggle={() => { if (!isTransitioningRef.current) onToggleTheme(); }} /></div></header>
     <div className="game-stage"><div key={`${card.id}-${index}`} className={`prompt-card card-${index % 3} ${isExiting ? `is-exiting is-exiting-${exitDirection}` : ''} ${isEntering ? 'is-entering' : ''}`} onAnimationEnd={handleCardAnimationEnd}><div className="card-topline"><span className="card-category">{category}</span><span className="card-mark">sip.</span></div><FitCardText text={card.text} /><div className="card-bottomline"><span>Tippen für nächste Karte</span><ArrowIcon /></div></div></div>
-    <footer className="game-footer"><span>Eine Runde. Eine Karte.</span><span className="tap-indicator"><i /> tap anywhere</span></footer>
+    <footer className="game-footer"><span>Karte {index + 1}/{deck.length} · {players.length} Spieler</span><span className="tap-indicator"><i /> TAP &amp; SWIPE</span></footer>
     {showQuit && <div className={`quit-backdrop ${isClosingQuit ? 'is-closing' : ''}`} role="presentation" onClick={dismissQuit}><section className="quit-dialog" role="dialog" aria-modal="true" aria-labelledby="quit-title" onClick={(event) => event.stopPropagation()}><span className="quit-dialog-mark">sip.</span><h2 id="quit-title">Spiel beenden?</h2><p>Die aktuelle Runde wird beendet. Du kannst jederzeit eine neue starten.</p><div className="quit-actions"><button className="text-button" type="button" onClick={dismissQuit}>Weiterspielen</button><button className="primary-button" type="button" onClick={leaveGame}>Beenden <ArrowIcon /></button></div></section></div>}
   </AppFrame>;
 }
