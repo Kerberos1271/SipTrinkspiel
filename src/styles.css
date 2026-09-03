@@ -182,7 +182,7 @@ h1 em, h2 em { color: var(--accent-secondary); font-style: normal; }
   .play-arrow { width: 3.1rem; height: 3.1rem; }
   .install-link { margin-top: .7rem; }
   .install-link { max-width: 19rem; }
-  .game-header { gap: .35rem; padding-inline: 1.25rem; }
+  .game-header { gap: .35rem; padding-inline: .25rem; }
   .game-exit { padding-inline: .58rem .68rem; }
   .finished-header { left: 1.25rem; right: 1.25rem; }
   .admin-grid { display: block; }
