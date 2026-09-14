@@ -380,9 +380,9 @@ function HomeScreen({ theme, onToggleTheme, onPlay, pwaInstall }: { theme: Theme
     <div className="ambient-orb orb-one" /><div className="ambient-orb orb-two" />
     <header className="home-header"><Logo /><div className="home-tools"><ThemeToggle theme={theme} onToggle={onToggleTheme} /></div></header>
     <section className="home-hero">
-      <div className="eyebrow"><span /> Partyspiel für deine Runde</div>
-      <h1>Gute Leute.<br /><em>Gute Ausreden.</em><br />Ein Drink.</h1>
-      <p className="hero-copy">Das Karten-Partyspiel, bei dem jede Runde ein bisschen anders läuft.</p>
+      <div className="eyebrow"><span /> Das Trinkspiel für deine Runde</div>
+      <h1>Gute Freunde.<br /><em>Unangenehme Fragen.</em><br />Ein Drink.</h1>
+      <p className="hero-copy">Das Trinkspiel, bei dem jede Runde ein bisschen anders läuft.</p>
       <button className="play-button" type="button" onClick={onPlay}><span>Play</span><span className="play-arrow"><ArrowIcon /></span></button>
       {pwaInstall.isInstallButtonVisible && <button className="install-link" type="button" onClick={() => void handleInstall()} disabled={pwaInstall.isPrompting}><span>Offline spielen? Installiere sip. auf deinem Smartphone</span><ArrowIcon /></button>}
     </section>
@@ -400,7 +400,7 @@ function InstallGuide({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: (
       ]
     : [
         ['01', 'Browser-Menü öffnen', 'Öffne sip. in deinem Browser und tippe auf die drei Punkte im Menü – je nach Browser oben oder unten.'],
-        ['02', 'App installieren', 'Tippe auf „App installieren“ oder – je nach Gerät und Browser – auf „Zum Startbildschirm hinzufügen“.'],
+        ['02', 'App installieren', 'Tippe je nach Gerät auf „App installieren“ oder auf „Zum Startbildschirm hinzufügen“.'],
         ['03', 'Installation bestätigen', 'Bestätige mit „Installieren“ oder „Hinzufügen“. Danach findest du sip. auf deinem Startbildschirm und kannst es wie eine App öffnen.'],
       ];
   return <AppFrame theme={theme} className="install-screen">
@@ -408,7 +408,7 @@ function InstallGuide({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: (
     <div className="install-content">
       <div className="eyebrow dark"><span /> sip. auf deinem Smartphone</div>
       <h1>Einmal einrichten.<br /><em>Immer bereit.</em></h1>
-      <p className="section-intro">Installiere sip. auf deinem Home-Bildschirm – dann ist die nächste Runde nur einen Tipp entfernt.</p>
+      <p className="section-intro">Installiere sip. auf deinem Home-Bildschirm – dann ist die nächste Runde nur einen Klick entfernt.</p>
       <div className="install-tabs" role="tablist" aria-label="Gerät auswählen">
         <button type="button" role="tab" aria-selected={device === 'ios'} className={device === 'ios' ? 'active' : ''} onClick={() => setDevice('ios')}>Apple / iOS</button>
         <button type="button" role="tab" aria-selected={device === 'android'} className={device === 'android' ? 'active' : ''} onClick={() => setDevice('android')}>Android</button>
