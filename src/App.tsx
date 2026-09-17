@@ -293,7 +293,7 @@ function PlayerApp({ theme, onToggleTheme, pwaInstall }: { theme: Theme; onToggl
   if (initialCacheRef.current === undefined) initialCacheRef.current = readGameDataCache();
   const initialCache = initialCacheRef.current;
   const [data, setData] = useState<GameData>(() => initialCache?.data || fallbackData);
-  const [players, setPlayers] = useState<string[]>(['Mia', 'Tom']);
+  const [players, setPlayers] = useState<string[]>(['Mone', 'Vedat']);
   const [activeCategoryIds, setActiveCategoryIds] = useState<number[]>(() => data.categories.map((category) => category.id));
   const [deck, setDeck] = useState<Card[]>([]);
   const [loadState, setLoadState] = useState<'loading' | 'ready'>('loading');
